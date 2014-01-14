@@ -14,6 +14,7 @@
 # limitations under the License.
 
 
+from climateclient.v1 import hosts
 from climateclient.v1 import leases
 
 
@@ -36,3 +37,5 @@ class Client(object):
 
         self.lease = leases.LeaseClientManager(self.climate_url,
                                                self.auth_token)
+        self.host = hosts.ComputeHostClientManager(self.climate_url,
+                                                   self.auth_token)

@@ -32,6 +32,7 @@ from climateclient import client as climate_client
 from climateclient import exception
 from climateclient.openstack.common import strutils
 from climateclient import utils
+from climateclient.v1.shell_commands import hosts
 from climateclient.v1.shell_commands import leases
 from climateclient import version as base_version
 
@@ -40,7 +41,12 @@ COMMANDS_V1 = {
     'lease-show': leases.ShowLease,
     'lease-create': leases.CreateLease,
     'lease-update': leases.UpdateLease,
-    'lease-delete': leases.DeleteLease
+    'lease-delete': leases.DeleteLease,
+    'host-list': hosts.ListHosts,
+    'host-show': hosts.ShowHost,
+    'host-create': hosts.CreateHost,
+    'host-update': hosts.UpdateHost,
+    'host-delete': hosts.DeleteHost
 }
 
 VERSION = 1

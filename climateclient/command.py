@@ -14,6 +14,7 @@
 # limitations under the License.
 
 from __future__ import print_function
+import ast
 import logging
 import six
 
@@ -62,6 +63,7 @@ class ClimateCommand(OpenStackCommand):
     values_specs = []
     json_indent = None
     resource = None
+    allow_names = True
 
     def __init__(self, app, app_args):
         super(ClimateCommand, self).__init__(app, app_args)
@@ -82,6 +84,18 @@ class ClimateCommand(OpenStackCommand):
 
     def format_output_data(self, data):
         for k, v in six.iteritems(data):
+            if isinstance(v, six.text_type):
+                try:
+                    # Deserialize if possible into dict, lists, tuples...
+                    v = ast.literal_eval(v)
+                except SyntaxError:
+                    # NOTE(sbauza): This is probably a datetime string, we need
+                    #               to keep it unchanged.
+                    pass
+                except ValueError:
+                    # NOTE(sbauza): This is not something AST can evaluate,
+                    #               probably a string.
+                    pass
             if isinstance(v, list):
                 value = '\n'.join(utils.dumps(
                     i, indent=self.json_indent) if isinstance(i, dict)
@@ -131,9 +145,13 @@ class UpdateCommand(ClimateCommand):
 
     def get_parser(self, prog_name):
         parser = super(UpdateCommand, self).get_parser(prog_name)
+        if self.allow_names:
+            help_str = 'ID or name of %s to delete'
+        else:
+            help_str = 'ID of %s to delete'
         parser.add_argument(
             'id', metavar=self.resource.upper(),
-            help='ID or name of %s to update' % self.resource
+            help=help_str % self.resource
         )
         self.add_known_arguments(parser)
         return parser
@@ -142,9 +160,12 @@ class UpdateCommand(ClimateCommand):
         self.log.debug('run(%s)' % parsed_args)
         climate_client = self.get_client()
         body = self.args2body(parsed_args)
-        res_id = utils.find_resource_id_by_name_or_id(climate_client,
-                                                      self.resource,
-                                                      parsed_args.id)
+        if self.allow_names:
+            res_id = utils.find_resource_id_by_name_or_id(climate_client,
+                                                          self.resource,
+                                                          parsed_args.id)
+        else:
+            res_id = parsed_args.id
         resource_manager = getattr(climate_client, self.resource)
         resource_manager.update(res_id, **body)
         print(self.app.stdout, 'Updated %s: %s' % (self.resource,
@@ -158,7 +179,6 @@ class DeleteCommand(ClimateCommand):
     api = 'reservation'
     resource = None
     log = None
-    allow_names = True
 
     def get_parser(self, prog_name):
         parser = super(DeleteCommand, self).get_parser(prog_name)
@@ -234,7 +254,6 @@ class ShowCommand(ClimateCommand, show.ShowOne):
     api = 'reservation'
     resource = None
     log = None
-    allow_names = True
 
     def get_parser(self, prog_name):
         parser = super(ShowCommand, self).get_parser(prog_name)
