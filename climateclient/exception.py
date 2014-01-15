@@ -70,3 +70,9 @@ class UnsupportedVersion(ClimateClientException):
     """Occurs if unsupported client version was requested."""
     message = _("Unsupported client version requested.")
     code = 406
+
+
+class IncorrectLease(ClimateClientException):
+    """Occurs if lease parameters are incorrect."""
+    message = _("The lease parameters are incorrect.")
+    code = 409
