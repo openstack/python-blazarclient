@@ -61,7 +61,7 @@ class LeaseClientManager(base.BaseClientManager):
             delta_sec = datetime.timedelta(seconds=seconds)
             new_end_date = cur_end_date + delta_sec
             values['end_date'] = datetime.datetime.strftime(
-                new_end_date, '%Y-%m-%dT%H:%M:%S.%f'
+                new_end_date, '%Y-%m-%d %H:%M'
             )
         if not values:
             return _('No values to update passed.')
