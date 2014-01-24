@@ -19,6 +19,7 @@ import json
 import requests
 
 from climateclient import exception
+from climateclient.openstack.common.gettextutils import _  # noqa
 
 
 class BaseClientManager(object):
@@ -124,7 +125,7 @@ class BaseClientManager(object):
             body = None
 
         if resp.status_code >= 400:
-            raise exception.ClimateClientException(resp.body,
-                                                   code=resp.status_code)
+            body = _("ERROR: {0}").format(body.get('error_message', body))
+            raise exception.ClimateClientException(body, code=resp.status_code)
 
         return resp, body
