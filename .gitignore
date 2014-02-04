@@ -1,0 +1,13 @@
+*.py[co]
+*.egg
+*.egg-info
+dist
+build
+eggs
+
+.tox
+.venv
+.idea
+
+AUTHORS
+ChangeLog
