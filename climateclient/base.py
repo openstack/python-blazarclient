@@ -125,7 +125,12 @@ class BaseClientManager(object):
             body = None
 
         if resp.status_code >= 400:
-            body = _("ERROR: {0}").format(body.get('error_message', body))
+            if body is not None:
+                error_message = body.get('error_message', body)
+            else:
+                error_message = resp.text
+
+            body = _("ERROR: {0}").format(error_message)
             raise exception.ClimateClientException(body, code=resp.status_code)
 
         return resp, body
