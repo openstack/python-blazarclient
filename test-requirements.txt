@@ -2,3 +2,11 @@ pep8==1.4.5
 pyflakes>=0.7.2,<0.7.4
 flake8==2.0
 hacking>=0.8.0,<0.9
+
+discover
+mock>=1.0
+mox>=0.5.3
+fixtures>=0.3.14
+testrepository>=0.0.18
+testtools>=0.9.34
+coverage>=3.6
