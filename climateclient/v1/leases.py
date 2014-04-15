@@ -72,6 +72,9 @@ class LeaseClientManager(base.BaseClientManager):
         """Deletes lease with specified ID."""
         self._delete('/leases/%s' % lease_id)
 
-    def list(self):
+    def list(self, sort_by=None):
         """List all leases."""
-        return self._get('/leases', 'leases')
+        leases = self._get('/leases', 'leases')
+        if sort_by:
+            leases = sorted(leases, key=lambda l: l[sort_by])
+        return leases
