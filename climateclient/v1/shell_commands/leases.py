@@ -27,6 +27,15 @@ class ListLeases(command.ListCommand):
     log = logging.getLogger(__name__ + '.ListLeases')
     list_columns = ['id', 'name', 'start_date', 'end_date']
 
+    def get_parser(self, prog_name):
+        parser = super(ListLeases, self).get_parser(prog_name)
+        parser.add_argument(
+            '--sort-by', metavar="<lease_column>",
+            help='column name used to sort result',
+            default='name'
+        )
+        return parser
+
 
 class ShowLease(command.ShowCommand):
     resource = 'lease'

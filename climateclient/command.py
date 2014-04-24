@@ -23,6 +23,7 @@ from cliff.formatters import table
 from cliff import lister
 from cliff import show
 
+from climateclient import exception
 from climateclient import utils
 
 
@@ -217,6 +218,16 @@ class ListCommand(ClimateCommand, lister.Lister):
     list_columns = []
     unknown_parts_flag = True
 
+    def args2body(self, parsed_args):
+        params = {}
+        if parsed_args.sort_by:
+            if parsed_args.sort_by in self.list_columns:
+                params['sort_by'] = parsed_args.sort_by
+            else:
+                msg = 'Invalid sort option %s' % parsed_args.sort_by
+                raise exception.ClimateClientException(msg)
+        return params
+
     def get_parser(self, prog_name):
         parser = super(ListCommand, self).get_parser(prog_name)
         return parser
@@ -224,8 +235,9 @@ class ListCommand(ClimateCommand, lister.Lister):
     def retrieve_list(self, parsed_args):
         """Retrieve a list of resources from Climate server"""
         climate_client = self.get_client()
+        body = self.args2body(parsed_args)
         resource_manager = getattr(climate_client, self.resource)
-        data = resource_manager.list()
+        data = resource_manager.list(**body)
         return data
 
     def setup_columns(self, info, parsed_args):

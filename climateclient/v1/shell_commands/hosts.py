@@ -24,6 +24,15 @@ class ListHosts(command.ListCommand):
     list_columns = ['id', 'hypervisor_hostname', 'vcpus', 'memory_mb',
                     'local_gb']
 
+    def get_parser(self, prog_name):
+        parser = super(ListHosts, self).get_parser(prog_name)
+        parser.add_argument(
+            '--sort-by', metavar="<host_column>",
+            help='column name used to sort result',
+            default='hypervisor_hostname'
+        )
+        return parser
+
 
 class ShowHost(command.ShowCommand):
     resource = 'host'

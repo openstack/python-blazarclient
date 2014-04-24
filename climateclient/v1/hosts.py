@@ -42,6 +42,9 @@ class ComputeHostClientManager(base.BaseClientManager):
         """Deletes host with specified ID."""
         self._delete('/os-hosts/%s' % host_id)
 
-    def list(self):
+    def list(self, sort_by=None):
         """List all hosts."""
-        return self._get('/os-hosts', 'hosts')
+        hosts = self._get('/os-hosts', 'hosts')
+        if sort_by:
+            hosts = sorted(hosts, key=lambda l: l[sort_by])
+        return hosts
