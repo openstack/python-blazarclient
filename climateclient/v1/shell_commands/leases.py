@@ -229,14 +229,21 @@ class UpdateLease(command.UpdateCommand):
             help='New name for the lease',
             default=None
         )
-        parser.add_argument(
+        #prolong-for and reduce_by are mutually exclusive
+        group = parser.add_mutually_exclusive_group()
+        group.add_argument(
             '--prolong-for',
             help='Time to prolong lease for',
             default=None
         )
-        parser.add_argument(
+        group.add_argument(
             '--prolong_for',
             help=argparse.SUPPRESS,
+            default=None
+        )
+        group.add_argument(
+            '--reduce-by',
+            help='Time to reduce lease by',
             default=None
         )
         return parser
@@ -247,6 +254,8 @@ class UpdateLease(command.UpdateCommand):
             params['name'] = parsed_args.name
         if parsed_args.prolong_for:
             params['prolong_for'] = parsed_args.prolong_for
+        if parsed_args.reduce_by:
+            params['reduce_by'] = parsed_args.reduce_by
         return params
 
 
