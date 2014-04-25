@@ -23,6 +23,7 @@ from climateclient import exception
 
 
 class ListLeases(command.ListCommand):
+    """Print a list of leases."""
     resource = 'lease'
     log = logging.getLogger(__name__ + '.ListLeases')
     list_columns = ['id', 'name', 'start_date', 'end_date']
@@ -38,12 +39,14 @@ class ListLeases(command.ListCommand):
 
 
 class ShowLease(command.ShowCommand):
+    """Show details about the given lease."""
     resource = 'lease'
     json_indent = 4
     log = logging.getLogger(__name__ + '.ShowLease')
 
 
 class CreateLease(command.CreateCommand):
+    """Create a lease."""
     resource = 'lease'
     log = logging.getLogger(__name__ + '.CreateLease')
     default_start = datetime.datetime.utcnow()
@@ -219,6 +222,7 @@ class CreateLease(command.CreateCommand):
 
 
 class UpdateLease(command.UpdateCommand):
+    """Update a lease."""
     resource = 'lease'
     log = logging.getLogger(__name__ + '.UpdateLease')
 
@@ -260,5 +264,6 @@ class UpdateLease(command.UpdateCommand):
 
 
 class DeleteLease(command.DeleteCommand):
+    """Delete a lease."""
     resource = 'lease'
     log = logging.getLogger(__name__ + '.DeleteLease')

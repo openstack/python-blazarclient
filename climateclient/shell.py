@@ -93,7 +93,7 @@ class HelpAction(argparse.Action):
         max_len = 0
         app = self.default
         parser.print_help(app.stdout)
-        app.stdout.write('\nCommands for API v%s:\n' % app.api_version)
+        app.stdout.write('\nCommands for API %s:\n' % app.api_version)
         command_manager = app.command_manager
         for name, ep in sorted(command_manager):
             factory = ep.load()
@@ -144,7 +144,7 @@ class ClimateShell(app.App):
             dest='verbose_level',
             const=0,
             help='suppress output except warnings and errors')
-        parser.add_argument(
+        help_action = parser.add_argument(
             '-h', '--help',
             action=HelpAction,
             nargs=0,
@@ -155,6 +155,19 @@ class ClimateShell(app.App):
             default=False,
             action='store_true',
             help='show tracebacks on errors')
+
+        # Removes help action to defer its execution
+        self.deferred_help_action = help_action
+        parser._actions.remove(help_action)
+        del parser._option_string_actions['-h']
+        del parser._option_string_actions['--help']
+        parser.add_argument(
+            '-h', '--help',
+            action='store_true',
+            dest='deferred_help',
+            default=False,
+            help="Show this help message and exit",
+        )
 
         # Global arguments
         parser.add_argument(
@@ -298,6 +311,9 @@ class ClimateShell(app.App):
                 argv = ['help', argv[command_pos]]
             if help_command_pos > -1 and command_pos == -1:
                 argv[help_command_pos] = '--help'
+
+            if self.options.deferred_help:
+                self.deferred_help_action(self.parser, self.parser, None, None)
 
             self.configure_logging()
             self.interactive_mode = not remainder

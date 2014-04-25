@@ -19,6 +19,7 @@ from climateclient import command
 
 
 class ListHosts(command.ListCommand):
+    """Print a list of host reservations."""
     resource = 'host'
     log = logging.getLogger(__name__ + '.ListHosts')
     list_columns = ['id', 'hypervisor_hostname', 'vcpus', 'memory_mb',
@@ -35,6 +36,7 @@ class ListHosts(command.ListCommand):
 
 
 class ShowHost(command.ShowCommand):
+    """Show host reservation details."""
     resource = 'host'
     json_indent = 4
     # NOTE(sbauza): We can't find by name as there is currently no column
@@ -44,6 +46,7 @@ class ShowHost(command.ShowCommand):
 
 
 class CreateHost(command.CreateCommand):
+    """Create a host reservation."""
     resource = 'host'
     json_indent = 4
     log = logging.getLogger(__name__ + '.CreateHost')
@@ -79,6 +82,7 @@ class CreateHost(command.CreateCommand):
 
 
 class UpdateHost(command.UpdateCommand):
+    """Update a host reservation."""
     resource = 'host'
     allow_names = False
     log = logging.getLogger(__name__ + '.UpdateHost')
@@ -108,6 +112,7 @@ class UpdateHost(command.UpdateCommand):
 
 
 class DeleteHost(command.DeleteCommand):
+    """Delete a host reservation."""
     resource = 'host'
     # NOTE(sbauza): We can't find by name as there is currently no column
     #  called 'name' but rather 'hypervisor_hostname'
