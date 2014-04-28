@@ -16,8 +16,8 @@
 import datetime
 
 from climateclient import base
-from climateclient import exception
 from climateclient.openstack.common.gettextutils import _  # noqa
+from climateclient import utils
 
 
 class LeaseClientManager(base.BaseClientManager):
@@ -45,24 +45,13 @@ class LeaseClientManager(base.BaseClientManager):
         lease_length_option = prolong_for or reduce_by
 
         if lease_length_option:
-            if lease_length_option.endswith('s'):
-                coefficient = 1
-            elif lease_length_option.endswith('m'):
-                coefficient = 60
-            elif lease_length_option.endswith('h'):
-                coefficient = 60 * 60
-            elif lease_length_option.endswith('d'):
-                coefficient = 24 * 60 * 60
-            else:
-                raise exception.ClimateClientException(_("Unsupportable date "
-                                                         "format for lease "
-                                                         "prolonging."))
+            seconds = utils.from_elapsed_time_to_seconds(lease_length_option)
+            seconds = seconds * (1 if prolong_for else -1)
+            delta_sec = datetime.timedelta(seconds=seconds)
+
             lease = self.get(lease_id)
             cur_end_date = datetime.datetime.strptime(lease['end_date'],
                                                       '%Y-%m-%dT%H:%M:%S.%f')
-            coefficient = coefficient * (1 if prolong_for else -1)
-            seconds = int(lease_length_option[:-1]) * coefficient
-            delta_sec = datetime.timedelta(seconds=seconds)
             new_end_date = cur_end_date + delta_sec
             values['end_date'] = datetime.datetime.strftime(
                 new_end_date, '%Y-%m-%d %H:%M'

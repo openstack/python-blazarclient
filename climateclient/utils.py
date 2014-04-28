@@ -19,13 +19,15 @@ import os
 import re
 import six
 
+from climate.openstack.common import timeutils
 from climateclient import exception
-
+from climateclient.openstack.common.gettextutils import _  # noqa
 
 HEX_ELEM = '[0-9A-Fa-f]'
 UUID_PATTERN = '-'.join([HEX_ELEM + '{8}', HEX_ELEM + '{4}',
                          HEX_ELEM + '{4}', HEX_ELEM + '{4}',
                          HEX_ELEM + '{12}'])
+ELAPSED_TIME_REGEX = '^(\d+)([s|m|h|d])$'
 
 
 def env(*args, **kwargs):
@@ -135,3 +137,28 @@ def _find_resource_id_by_name(client, resource, name):
         message = "Unable to find %s with name '%s'" % (resource, name)
         raise exception.ClimateClientException(message=message,
                                                status_code=404)
+
+
+def from_elapsed_time_to_seconds(elapsed_time):
+    """Return the amount of seconds based on the time_option parameter
+    :param: time_option: a string that matches ELAPSED_TIME_REGEX
+    """
+    is_elapsed_time = re.match(ELAPSED_TIME_REGEX, elapsed_time)
+    if is_elapsed_time is None:
+        raise exception.ClimateClientException(_("Invalid time "
+                                                 "format for option."))
+    elapsed_time_value = int(is_elapsed_time.group(1))
+    elapsed_time_option = is_elapsed_time.group(2)
+    seconds = {
+        's': lambda x:
+        timeutils.total_seconds(datetime.timedelta(seconds=x)),
+        'm': lambda x:
+        timeutils.total_seconds(datetime.timedelta(minutes=x)),
+        'h': lambda x:
+        timeutils.total_seconds(datetime.timedelta(hours=x)),
+        'd': lambda x:
+        timeutils.total_seconds(datetime.timedelta(days=x)),
+    }[elapsed_time_option](elapsed_time_value)
+
+    # the above code returns a "float"
+    return int(seconds)
