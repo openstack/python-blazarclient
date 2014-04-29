@@ -29,6 +29,9 @@ UUID_PATTERN = '-'.join([HEX_ELEM + '{8}', HEX_ELEM + '{4}',
                          HEX_ELEM + '{12}'])
 ELAPSED_TIME_REGEX = '^(\d+)([s|m|h|d])$'
 
+LEASE_DATE_FORMAT = '%Y-%m-%dT%H:%M:%S.%f'
+API_DATE_FORMAT = '%Y-%m-%d %H:%M'
+
 
 def env(*args, **kwargs):
     """Returns the first environment variable set.
@@ -139,9 +142,12 @@ def _find_resource_id_by_name(client, resource, name):
                                                status_code=404)
 
 
-def from_elapsed_time_to_seconds(elapsed_time):
-    """Return the amount of seconds based on the time_option parameter
-    :param: time_option: a string that matches ELAPSED_TIME_REGEX
+def from_elapsed_time_to_seconds(elapsed_time, pos_sign=True):
+    """Return the positive or negative amount of seconds based on the
+    elapsed_time parameter with a sign depending on the sign parameter.
+    :param: elapsed_time: a string that matches ELAPSED_TIME_REGEX
+    :param: sign: if pos_sign is True, the returned value will be positive.
+    Otherwise it will be positive.
     """
     is_elapsed_time = re.match(ELAPSED_TIME_REGEX, elapsed_time)
     if is_elapsed_time is None:
@@ -161,4 +167,17 @@ def from_elapsed_time_to_seconds(elapsed_time):
     }[elapsed_time_option](elapsed_time_value)
 
     # the above code returns a "float"
-    return int(seconds)
+    if pos_sign:
+        return int(seconds)
+    return int(seconds) * -1
+
+
+def from_elapsed_time_to_delta(elapsed_time, pos_sign=True):
+    """Return the positive or negative delta time based on the
+    elapsed_time parameter.
+    :param: elapsed_time: a string that matches ELAPSED_TIME_REGEX
+    :param: sign: if sign is True, the returned value will be negative.
+    Otherwise it will be positive.
+    """
+    seconds = from_elapsed_time_to_seconds(elapsed_time, pos_sign=pos_sign)
+    return datetime.timedelta(seconds=seconds)

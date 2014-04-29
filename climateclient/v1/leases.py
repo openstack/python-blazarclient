@@ -13,10 +13,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import datetime
-
 from climateclient import base
 from climateclient.openstack.common.gettextutils import _  # noqa
+from climateclient.openstack.common import timeutils
 from climateclient import utils
 
 
@@ -36,26 +35,30 @@ class LeaseClientManager(base.BaseClientManager):
         """
         return self._get('/leases/%s' % lease_id, 'lease')
 
-    def update(self, lease_id, name=None, prolong_for=None, reduce_by=None):
+    def update(self, lease_id, name=None, prolong_for=None, reduce_by=None,
+               defer_by=None):
         """Update attributes of the lease."""
         values = {}
         if name:
             values['name'] = name
 
-        lease_length_option = prolong_for or reduce_by
+        lease_end_date_change = prolong_for or reduce_by
+        lease_start_date_change = defer_by
+        lease = None
 
-        if lease_length_option:
-            seconds = utils.from_elapsed_time_to_seconds(lease_length_option)
-            seconds = seconds * (1 if prolong_for else -1)
-            delta_sec = datetime.timedelta(seconds=seconds)
-
+        if lease_end_date_change:
             lease = self.get(lease_id)
-            cur_end_date = datetime.datetime.strptime(lease['end_date'],
-                                                      '%Y-%m-%dT%H:%M:%S.%f')
-            new_end_date = cur_end_date + delta_sec
-            values['end_date'] = datetime.datetime.strftime(
-                new_end_date, '%Y-%m-%d %H:%M'
-            )
+            self._add_lease_date(values, lease, 'end_date',
+                                 lease_end_date_change,
+                                 prolong_for is not None)
+
+        if lease_start_date_change:
+            if lease is None:
+                lease = self.get(lease_id)
+            self._add_lease_date(values, lease, 'start_date',
+                                 lease_start_date_change,
+                                 True)
+
         if not values:
             return _('No values to update passed.')
         return self._update('/leases/%s' % lease_id, values,
@@ -71,3 +74,12 @@ class LeaseClientManager(base.BaseClientManager):
         if sort_by:
             leases = sorted(leases, key=lambda l: l[sort_by])
         return leases
+
+    def _add_lease_date(self, values, lease, key, delta_date, positive_delta):
+        delta_sec = utils.from_elapsed_time_to_delta(
+            delta_date,
+            pos_sign=positive_delta)
+        date = timeutils.parse_strtime(lease[key],
+                                       utils.LEASE_DATE_FORMAT)
+        values[key] = timeutils.strtime(date + delta_sec,
+                                        utils.API_DATE_FORMAT)

@@ -250,6 +250,15 @@ class UpdateLease(command.UpdateCommand):
             help='Time to reduce lease by',
             default=None
         )
+
+        #defer-by and a 'future' advance-by are mutually exclusive
+        group = parser.add_mutually_exclusive_group()
+        group.add_argument(
+            '--defer-by',
+            help='Time to defer the lease start',
+            default=None
+        )
+
         return parser
 
     def args2body(self, parsed_args):
@@ -260,6 +269,8 @@ class UpdateLease(command.UpdateCommand):
             params['prolong_for'] = parsed_args.prolong_for
         if parsed_args.reduce_by:
             params['reduce_by'] = parsed_args.reduce_by
+        if parsed_args.defer_by:
+            params['defer_by'] = parsed_args.defer_by
         return params
 
 
