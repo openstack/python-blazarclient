@@ -112,8 +112,8 @@ def find_resource_id_by_name_or_id(client, resource, name_or_id):
         for resource in resources:
             if resource['id'] == name_or_id:
                 return name_or_id
-        raise exception.ClimateClientException('No %s found with ID %s' %
-                                               (resource, name_or_id))
+        raise exception.ClimateClientException('No resource found with ID %s' %
+                                               name_or_id)
     return _find_resource_id_by_name(client, resource, name_or_id)
 
 
@@ -134,7 +134,7 @@ def _find_resource_id_by_name(client, resource, name):
     elif named_resources:
         return named_resources[0]
     else:
-        message = "Unable to find %s with name '%s'" % (resource, name)
+        message = "Unable to find resource with name '%s'" % name
         raise exception.ClimateClientException(message=message,
                                                status_code=404)
 
