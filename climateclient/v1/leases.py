@@ -36,14 +36,14 @@ class LeaseClientManager(base.BaseClientManager):
         return self._get('/leases/%s' % lease_id, 'lease')
 
     def update(self, lease_id, name=None, prolong_for=None, reduce_by=None,
-               defer_by=None):
+               advance_by=None, defer_by=None):
         """Update attributes of the lease."""
         values = {}
         if name:
             values['name'] = name
 
         lease_end_date_change = prolong_for or reduce_by
-        lease_start_date_change = defer_by
+        lease_start_date_change = defer_by or advance_by
         lease = None
 
         if lease_end_date_change:
@@ -57,7 +57,7 @@ class LeaseClientManager(base.BaseClientManager):
                 lease = self.get(lease_id)
             self._add_lease_date(values, lease, 'start_date',
                                  lease_start_date_change,
-                                 True)
+                                 defer_by is not None)
 
         if not values:
             return _('No values to update passed.')

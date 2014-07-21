@@ -258,6 +258,11 @@ class UpdateLease(command.UpdateCommand):
             help='Time to defer the lease start',
             default=None
         )
+        group.add_argument(
+            '--advance-by',
+            help='Time to advance the lease start',
+            default=None
+        )
 
         return parser
 
@@ -271,6 +276,8 @@ class UpdateLease(command.UpdateCommand):
             params['reduce_by'] = parsed_args.reduce_by
         if parsed_args.defer_by:
             params['defer_by'] = parsed_args.defer_by
+        if parsed_args.advance_by:
+            params['advance_by'] = parsed_args.advance_by
         return params
 
 
