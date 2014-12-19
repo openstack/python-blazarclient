@@ -159,8 +159,29 @@ class CreateLease(command.CreateCommand):
                         parse_params(match.group(3))
 
             parse_params(phys_res_str)
-            if not phys_res_info['min'] and not phys_res_info['max']:
+            if not (phys_res_info['min'] and phys_res_info['max']):
                 raise exception.IncorrectLease(err_msg)
+
+            try:
+                min_host = int(phys_res_info['min'])
+                max_host = int(phys_res_info['max'])
+            except Exception:
+                raise exception.IncorrectLease(err_msg)
+
+            if min_host > max_host:
+                err_msg = ("Invalid physical-reservation argument '%s'. "
+                           "Reservation argument min value must be "
+                           "less than max value"
+                           % phys_res_str)
+                raise exception.IncorrectLease(err_msg)
+
+            if min_host == 0 or max_host == 0:
+                err_msg = ("Invalid physical-reservation argument '%s'. "
+                           "Reservation arguments min and max values "
+                           "must be greater than or equal to 1"
+                           % phys_res_str)
+                raise exception.IncorrectLease(err_msg)
+
             # NOTE(sbauza): The resource type should be conf-driven mapped with
             #               blazar.conf file but that's potentially on another
             #               host
