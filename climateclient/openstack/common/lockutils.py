@@ -26,10 +26,10 @@ import time
 import weakref
 
 from oslo_config import cfg
+from oslo_log import log as logging
 
 from climateclient.openstack.common import fileutils
 from climateclient.openstack.common.gettextutils import _
-from climateclient.openstack.common import log as logging
 
 
 LOG = logging.getLogger(__name__)

@@ -18,9 +18,11 @@ import errno
 import os
 import tempfile
 
+from oslo_log import log as logging
+
 from climateclient.openstack.common import excutils
 from climateclient.openstack.common.gettextutils import _
-from climateclient.openstack.common import log as logging
+
 
 LOG = logging.getLogger(__name__)
 
