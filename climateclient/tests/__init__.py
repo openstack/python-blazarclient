@@ -15,18 +15,12 @@
 # limitations under the License.
 
 
-from climateclient.openstack.common.fixture import config
-from climateclient.openstack.common.fixture import mockpatch
-from climateclient.openstack.common import test
+from oslotest import base
+from oslotest import mockpatch
 
 
-class TestCase(test.BaseTestCase):
+class TestCase(base.BaseTestCase):
     """Test case base class for all unit tests."""
-
-    def setUp(self):
-        """Run before each test method to initialize test environment."""
-        super(TestCase, self).setUp()
-        self.useFixture(config.Config())
 
     def patch(self, obj, attr):
         """Returns a Mocked object on the patched attribute."""
