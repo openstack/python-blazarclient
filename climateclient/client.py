@@ -13,9 +13,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from oslo_utils import importutils
+
 from climateclient import exception
 from climateclient.openstack.common.gettextutils import _  # noqa
-from climateclient.openstack.common import importutils
 
 
 def Client(version=1, *args, **kwargs):

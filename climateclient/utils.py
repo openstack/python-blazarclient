@@ -21,7 +21,6 @@ import six
 
 from climateclient import exception
 from climateclient.openstack.common.gettextutils import _  # noqa
-from climateclient.openstack.common import timeutils
 
 HEX_ELEM = '[0-9A-Fa-f]'
 UUID_PATTERN = '-'.join([HEX_ELEM + '{8}', HEX_ELEM + '{4}',
@@ -157,13 +156,13 @@ def from_elapsed_time_to_seconds(elapsed_time, pos_sign=True):
     elapsed_time_option = is_elapsed_time.group(2)
     seconds = {
         's': lambda x:
-        timeutils.total_seconds(datetime.timedelta(seconds=x)),
+        datetime.timedelta(seconds=x).total_seconds(),
         'm': lambda x:
-        timeutils.total_seconds(datetime.timedelta(minutes=x)),
+        datetime.timedelta(minutes=x).total_seconds(),
         'h': lambda x:
-        timeutils.total_seconds(datetime.timedelta(hours=x)),
+        datetime.timedelta(hours=x).total_seconds(),
         'd': lambda x:
-        timeutils.total_seconds(datetime.timedelta(days=x)),
+        datetime.timedelta(days=x).total_seconds(),
     }[elapsed_time_option](elapsed_time_value)
 
     # the above code returns a "float"

@@ -13,9 +13,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from oslo_utils import importutils
+
 from climateclient import client
 from climateclient import exception
-from climateclient.openstack.common import importutils
 from climateclient import tests
 
 

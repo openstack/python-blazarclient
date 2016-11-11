@@ -27,10 +27,10 @@ from cliff import app
 from cliff import commandmanager
 from keystoneclient import exceptions as keystone_exceptions
 import keystoneclient.v2_0 as keystone_client
+from oslo_utils import encodeutils
 
 from climateclient import client as climate_client
 from climateclient import exception
-from climateclient.openstack.common import strutils
 from climateclient import utils
 from climateclient.v1.shell_commands import hosts
 from climateclient.v1.shell_commands import leases
@@ -473,7 +473,7 @@ class ClimateShell(app.App):
 
 def main(argv=sys.argv[1:]):
     try:
-        return ClimateShell().run(map(strutils.safe_decode, argv))
+        return ClimateShell().run(map(encodeutils.safe_decode, argv))
     except exception.ClimateClientException:
         return 1
     except Exception as e:

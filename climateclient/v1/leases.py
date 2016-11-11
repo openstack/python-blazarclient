@@ -13,9 +13,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from oslo_utils import timeutils
+
 from climateclient import base
 from climateclient.openstack.common.gettextutils import _  # noqa
-from climateclient.openstack.common import timeutils
 from climateclient import utils
 
 
