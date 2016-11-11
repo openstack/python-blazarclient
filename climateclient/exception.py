@@ -14,7 +14,7 @@
 # limitations under the License.
 
 
-from climateclient.openstack.common.gettextutils import _  # noqa
+from climateclient.i18n import _
 
 
 class ClimateClientException(Exception):

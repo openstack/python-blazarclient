@@ -19,7 +19,7 @@ import json
 import requests
 
 from climateclient import exception
-from climateclient.openstack.common.gettextutils import _  # noqa
+from climateclient.i18n import _
 
 
 class BaseClientManager(object):

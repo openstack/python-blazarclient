@@ -16,7 +16,7 @@
 from oslo_utils import timeutils
 
 from climateclient import base
-from climateclient.openstack.common.gettextutils import _  # noqa
+from climateclient.i18n import _
 from climateclient import utils
 
 

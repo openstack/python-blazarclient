@@ -20,7 +20,7 @@ import re
 import six
 
 from climateclient import exception
-from climateclient.openstack.common.gettextutils import _  # noqa
+from climateclient.i18n import _
 
 HEX_ELEM = '[0-9A-Fa-f]'
 UUID_PATTERN = '-'.join([HEX_ELEM + '{8}', HEX_ELEM + '{4}',

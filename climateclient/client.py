@@ -16,7 +16,7 @@
 from oslo_utils import importutils
 
 from climateclient import exception
-from climateclient.openstack.common.gettextutils import _  # noqa
+from climateclient.i18n import _
 
 
 def Client(version=1, *args, **kwargs):
