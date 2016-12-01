@@ -147,9 +147,9 @@ class UpdateCommand(ClimateCommand):
     def get_parser(self, prog_name):
         parser = super(UpdateCommand, self).get_parser(prog_name)
         if self.allow_names:
-            help_str = 'ID or name of %s to delete'
+            help_str = 'ID or name of %s to update'
         else:
-            help_str = 'ID of %s to delete'
+            help_str = 'ID of %s to update'
         parser.add_argument(
             'id', metavar=self.resource.upper(),
             help=help_str % self.resource
