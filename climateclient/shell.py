@@ -25,8 +25,8 @@ import sys
 
 from cliff import app
 from cliff import commandmanager
+from keystoneclient import client as keystone_client
 from keystoneclient import exceptions as keystone_exceptions
-import keystoneclient.v2_0 as keystone_client
 from oslo_utils import encodeutils
 
 from climateclient import client as climate_client
