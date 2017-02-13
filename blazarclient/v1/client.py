@@ -14,12 +14,12 @@
 # limitations under the License.
 
 
-from climateclient.v1 import hosts
-from climateclient.v1 import leases
+from blazarclient.v1 import hosts
+from blazarclient.v1 import leases
 
 
 class Client(object):
-    """Top level object to communicate with Climate.
+    """Top level object to communicate with Blazar.
 
     Contains managers to control requests that should be passed to each type of
     resources - leases, events, etc.
@@ -31,11 +31,11 @@ class Client(object):
         ...
     """
 
-    def __init__(self, climate_url, auth_token):
-        self.climate_url = climate_url
+    def __init__(self, blazar_url, auth_token):
+        self.blazar_url = blazar_url
         self.auth_token = auth_token
 
-        self.lease = leases.LeaseClientManager(self.climate_url,
+        self.lease = leases.LeaseClientManager(self.blazar_url,
                                                self.auth_token)
-        self.host = hosts.ComputeHostClientManager(self.climate_url,
+        self.host = hosts.ComputeHostClientManager(self.blazar_url,
                                                    self.auth_token)

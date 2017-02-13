@@ -14,7 +14,7 @@
 # limitations under the License.
 
 """
-Command-line interface to the Climate APIs
+Command-line interface to the Blazar APIs
 """
 
 from __future__ import print_function
@@ -29,12 +29,12 @@ from keystoneclient import client as keystone_client
 from keystoneclient import exceptions as keystone_exceptions
 from oslo_utils import encodeutils
 
-from climateclient import client as climate_client
-from climateclient import exception
-from climateclient import utils
-from climateclient.v1.shell_commands import hosts
-from climateclient.v1.shell_commands import leases
-from climateclient import version as base_version
+from blazarclient import client as blazar_client
+from blazarclient import exception
+from blazarclient import utils
+from blazarclient.v1.shell_commands import hosts
+from blazarclient.v1.shell_commands import leases
+from blazarclient import version as base_version
 
 COMMANDS_V1 = {
     'lease-list': leases.ListLeases,
@@ -106,17 +106,17 @@ class HelpAction(argparse.Action):
         sys.exit(0)
 
 
-class ClimateShell(app.App):
-    """Manager class for the Climate CLI."""
+class BlazarShell(app.App):
+    """Manager class for the Blazar CLI."""
     CONSOLE_MESSAGE_FORMAT = '%(message)s'
     DEBUG_MESSAGE_FORMAT = '%(levelname)s: %(name)s %(message)s'
     log = logging.getLogger(__name__)
 
     def __init__(self):
-        super(ClimateShell, self).__init__(
+        super(BlazarShell, self).__init__(
             description=__doc__.strip(),
             version=VERSION,
-            command_manager=commandmanager.CommandManager('climate.cli'), )
+            command_manager=commandmanager.CommandManager('blazar.cli'), )
         self.commands = COMMANDS
 
     def build_option_parser(self, description, version, argparse_kwargs=None):
@@ -247,8 +247,8 @@ class ClimateShell(app.App):
         parser.add_argument(
             '--insecure',
             action='store_true',
-            default=env('CLIMATECLIENT_INSECURE', default=False),
-            help="Explicitly allow climateclient to perform \"insecure\" "
+            default=env('BLAZARCLIENT_INSECURE', default=False),
+            help="Explicitly allow blazarclient to perform \"insecure\" "
                  "SSL (https) requests. The server's certificate will "
                  "not be verified against any certificate authorities. "
                  "This option should be used with caution.")
@@ -412,18 +412,18 @@ class ClimateShell(app.App):
 
         if auth:
             try:
-                climate_url = keystone.service_catalog.url_for(
+                blazar_url = keystone.service_catalog.url_for(
                     service_type='reservation'
                 )
             except keystone_exceptions.EndpointNotFound:
-                raise exception.NoClimateEndpoint()
+                raise exception.NoBlazarEndpoint()
         else:
             raise exception.NotAuthorized("User %s is not authorized." %
                                           self.options.os_username)
 
-        client = climate_client.Client(self.options.os_reservation_api_version,
-                                       climate_url=climate_url,
-                                       auth_token=keystone.auth_token)
+        client = blazar_client.Client(self.options.os_reservation_api_version,
+                                      blazar_url=blazar_url,
+                                      auth_token=keystone.auth_token)
         self.client = client
         return
 
@@ -434,7 +434,7 @@ class ClimateShell(app.App):
         * validate authentication info
         """
 
-        super(ClimateShell, self).initialize_app(argv)
+        super(BlazarShell, self).initialize_app(argv)
 
         cmd_name = None
         if argv:
@@ -473,8 +473,8 @@ class ClimateShell(app.App):
 
 def main(argv=sys.argv[1:]):
     try:
-        return ClimateShell().run(map(encodeutils.safe_decode, argv))
-    except exception.ClimateClientException:
+        return BlazarShell().run(map(encodeutils.safe_decode, argv))
+    except exception.BlazarClientException:
         return 1
     except Exception as e:
         print(unicode(e))

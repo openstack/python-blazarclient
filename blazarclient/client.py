@@ -15,14 +15,14 @@
 
 from oslo_utils import importutils
 
-from climateclient import exception
-from climateclient.i18n import _
+from blazarclient import exception
+from blazarclient.i18n import _
 
 
 def Client(version=1, *args, **kwargs):
     version_map = {
-        '1': 'climateclient.v1.client.Client',
-        '1a0': 'climateclient.v1.client.Client',
+        '1': 'blazarclient.v1.client.Client',
+        '1a0': 'blazarclient.v1.client.Client',
     }
     try:
         client_path = version_map[str(version)]

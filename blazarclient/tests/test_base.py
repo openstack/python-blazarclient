@@ -16,9 +16,9 @@
 
 import requests
 
-from climateclient import base
-from climateclient import exception
-from climateclient import tests
+from blazarclient import base
+from blazarclient import exception
+from blazarclient import tests
 
 
 class BaseClientManagerTestCase(tests.TestCase):
@@ -87,7 +87,7 @@ class BaseClientManagerTestCase(tests.TestCase):
 
         kwargs = {"body": {"key": "value"}}
 
-        self.assertRaises(exception.ClimateClientException,
+        self.assertRaises(exception.BlazarClientException,
                           self.manager.request,
                           self.url, "POST", **kwargs)
 
@@ -97,6 +97,6 @@ class BaseClientManagerTestCase(tests.TestCase):
 
         kwargs = {"body": "key"}
 
-        self.assertRaises(exception.ClimateClientException,
+        self.assertRaises(exception.BlazarClientException,
                           self.manager.request,
                           self.url, "POST", **kwargs)

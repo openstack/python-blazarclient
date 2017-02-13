@@ -18,8 +18,8 @@ import json
 
 import requests
 
-from climateclient import exception
-from climateclient.i18n import _
+from blazarclient import exception
+from blazarclient.i18n import _
 
 
 class BaseClientManager(object):
@@ -28,16 +28,16 @@ class BaseClientManager(object):
     There are environments, nodes and jobs types of API requests.
     Manager provides CRUD operations for them.
     """
-    def __init__(self, climate_url, auth_token):
-        self.climate_url = climate_url
+    def __init__(self, blazar_url, auth_token):
+        self.blazar_url = blazar_url
         self.auth_token = auth_token
 
-    USER_AGENT = 'python-climateclient'
+    USER_AGENT = 'python-blazarclient'
 
     def _get(self, url, response_key):
-        """Sends get request to Climate.
+        """Sends get request to Blazar.
 
-        :param url: URL to the wanted Climate resource.
+        :param url: URL to the wanted Blazar resource.
         :type url: str
 
         :param response_key: Type of resource (environment, node, job).
@@ -50,9 +50,9 @@ class BaseClientManager(object):
         return body[response_key]
 
     def _create(self, url, body, response_key):
-        """Sends create request to Climate.
+        """Sends create request to Blazar.
 
-        :param url: URL to the wanted Climate resource.
+        :param url: URL to the wanted Blazar resource.
         :type url: str
 
         :param body: Values resource to be created from.
@@ -68,17 +68,17 @@ class BaseClientManager(object):
         return body[response_key]
 
     def _delete(self, url):
-        """Sends delete request to Climate.
+        """Sends delete request to Blazar.
 
-        :param url: URL to the wanted Climate resource.
+        :param url: URL to the wanted Blazar resource.
         :type url: str
         """
         resp, body = self.request(url, 'DELETE')
 
     def _update(self, url, body, response_key=None):
-        """Sends update request to Climate.
+        """Sends update request to Blazar.
 
-        :param url: URL to the wanted Climate resource.
+        :param url: URL to the wanted Blazar resource.
         :type url: str
 
         :param body: Values resource to be updated from.
@@ -117,7 +117,7 @@ class BaseClientManager(object):
             kwargs['data'] = json.dumps(kwargs['body'])
             del kwargs['body']
 
-        resp = requests.request(method, self.climate_url + url, **kwargs)
+        resp = requests.request(method, self.blazar_url + url, **kwargs)
 
         try:
             body = json.loads(resp.text)
@@ -131,6 +131,6 @@ class BaseClientManager(object):
                 error_message = resp.text
 
             body = _("ERROR: {0}").format(error_message)
-            raise exception.ClimateClientException(body, code=resp.status_code)
+            raise exception.BlazarClientException(body, code=resp.status_code)
 
         return resp, body

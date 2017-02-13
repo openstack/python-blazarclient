@@ -15,7 +15,7 @@
 
 import logging
 
-from climateclient import command
+from blazarclient import command
 
 
 class ListHosts(command.ListCommand):

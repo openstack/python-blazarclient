@@ -15,9 +15,9 @@
 
 from oslo_utils import timeutils
 
-from climateclient import base
-from climateclient.i18n import _
-from climateclient import utils
+from blazarclient import base
+from blazarclient.i18n import _
+from blazarclient import utils
 
 
 class LeaseClientManager(base.BaseClientManager):

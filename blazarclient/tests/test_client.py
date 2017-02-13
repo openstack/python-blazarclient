@@ -15,9 +15,9 @@
 
 from oslo_utils import importutils
 
-from climateclient import client
-from climateclient import exception
-from climateclient import tests
+from blazarclient import client
+from blazarclient import exception
+from blazarclient import tests
 
 
 class BaseClientTestCase(tests.TestCase):
@@ -32,12 +32,12 @@ class BaseClientTestCase(tests.TestCase):
     def test_with_v1(self):
         self.client.Client()
         self.import_obj.assert_called_once_with(
-            'climateclient.v1.client.Client')
+            'blazarclient.v1.client.Client')
 
     def test_with_v1a0(self):
         self.client.Client(version='1a0')
         self.import_obj.assert_called_once_with(
-            'climateclient.v1.client.Client')
+            'blazarclient.v1.client.Client')
 
     def test_with_wrong_vers(self):
         self.assertRaises(exception.UnsupportedVersion,

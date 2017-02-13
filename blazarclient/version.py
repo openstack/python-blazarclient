@@ -16,4 +16,4 @@
 import pbr.version
 
 
-__version__ = pbr.version.VersionInfo('python-climateclient').version_string()
+__version__ = pbr.version.VersionInfo('python-blazarclient').version_string()

@@ -19,8 +19,8 @@ import os
 import re
 import six
 
-from climateclient import exception
-from climateclient.i18n import _
+from blazarclient import exception
+from blazarclient.i18n import _
 
 HEX_ELEM = '[0-9A-Fa-f]'
 UUID_PATTERN = '-'.join([HEX_ELEM + '{8}', HEX_ELEM + '{4}',
@@ -114,8 +114,8 @@ def find_resource_id_by_name_or_id(client, resource, name_or_id):
         for resource in resources:
             if resource['id'] == name_or_id:
                 return name_or_id
-        raise exception.ClimateClientException('No resource found with ID %s' %
-                                               name_or_id)
+        raise exception.BlazarClientException('No resource found with ID %s' %
+                                              name_or_id)
     return _find_resource_id_by_name(client, resource, name_or_id)
 
 
@@ -137,8 +137,8 @@ def _find_resource_id_by_name(client, resource, name):
         return named_resources[0]
     else:
         message = "Unable to find resource with name '%s'" % name
-        raise exception.ClimateClientException(message=message,
-                                               status_code=404)
+        raise exception.BlazarClientException(message=message,
+                                              status_code=404)
 
 
 def from_elapsed_time_to_seconds(elapsed_time, pos_sign=True):
@@ -150,8 +150,8 @@ def from_elapsed_time_to_seconds(elapsed_time, pos_sign=True):
     """
     is_elapsed_time = re.match(ELAPSED_TIME_REGEX, elapsed_time)
     if is_elapsed_time is None:
-        raise exception.ClimateClientException(_("Invalid time "
-                                                 "format for option."))
+        raise exception.BlazarClientException(_("Invalid time "
+                                                "format for option."))
     elapsed_time_value = int(is_elapsed_time.group(1))
     elapsed_time_option = is_elapsed_time.group(2)
     seconds = {

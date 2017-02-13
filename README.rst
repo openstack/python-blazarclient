@@ -1,5 +1,5 @@
-==============
-Climate client
-==============
+=============
+Blazar client
+=============
 
-**Climate client** provides possibility to use *Climate* API(s).
+**Blazar client** provides possibility to use *Blazar* API(s).

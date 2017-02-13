@@ -16,8 +16,8 @@
 import mock
 import testtools
 
-from climateclient import command
-from climateclient import tests
+from blazarclient import command
+from blazarclient import tests
 
 
 class OpenstackCommandTestCase(tests.TestCase):
@@ -48,15 +48,15 @@ class TableFormatterTestCase(tests.TestCase):
         pass
 
 
-class ClimateCommandTestCase(tests.TestCase):
+class BlazarCommandTestCase(tests.TestCase):
 
     def setUp(self):
-        super(ClimateCommandTestCase, self).setUp()
+        super(BlazarCommandTestCase, self).setUp()
 
         self.app = mock.MagicMock()
         self.parser = self.patch(command.OpenStackCommand, 'get_parser')
 
-        self.command = command.ClimateCommand(self.app, [])
+        self.command = command.BlazarCommand(self.app, [])
 
     def test_get_client(self):
         client = self.command.get_client()

@@ -13,8 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from climateclient import base
-from climateclient.i18n import _
+from blazarclient import base
+from blazarclient.i18n import _
 
 
 class ComputeHostClientManager(base.BaseClientManager):

@@ -23,8 +23,8 @@ from cliff.formatters import table
 from cliff import lister
 from cliff import show
 
-from climateclient import exception
-from climateclient import utils
+from blazarclient import exception
+from blazarclient import utils
 
 
 class OpenStackCommand(command.Command):
@@ -56,18 +56,18 @@ class TableFormatter(table.TableFormatter):
             stdout.write('\n')
 
 
-class ClimateCommand(OpenStackCommand):
+class BlazarCommand(OpenStackCommand):
 
-    """Base Climate CLI command."""
+    """Base Blazar CLI command."""
     api = 'reservation'
-    log = logging.getLogger(__name__ + '.ClimateCommand')
+    log = logging.getLogger(__name__ + '.BlazarCommand')
     values_specs = []
     json_indent = None
     resource = None
     allow_names = True
 
     def __init__(self, app, app_args):
-        super(ClimateCommand, self).__init__(app, app_args)
+        super(BlazarCommand, self).__init__(app, app_args)
 
         # NOTE(dbelova): This is no longer supported in cliff version 1.5.2
         # the same moment occurred in Neutron:
@@ -80,7 +80,7 @@ class ClimateCommand(OpenStackCommand):
         return self.app.client
 
     def get_parser(self, prog_name):
-        parser = super(ClimateCommand, self).get_parser(prog_name)
+        parser = super(BlazarCommand, self).get_parser(prog_name)
         return parser
 
     def format_output_data(self, data):
@@ -115,7 +115,7 @@ class ClimateCommand(OpenStackCommand):
         return {}
 
 
-class CreateCommand(ClimateCommand, show.ShowOne):
+class CreateCommand(BlazarCommand, show.ShowOne):
     """Create resource with passed args."""
 
     api = 'reservation'
@@ -124,9 +124,9 @@ class CreateCommand(ClimateCommand, show.ShowOne):
 
     def get_data(self, parsed_args):
         self.log.debug('get_data(%s)' % parsed_args)
-        climate_client = self.get_client()
+        blazar_client = self.get_client()
         body = self.args2body(parsed_args)
-        resource_manager = getattr(climate_client, self.resource)
+        resource_manager = getattr(blazar_client, self.resource)
         data = resource_manager.create(**body)
         self.format_output_data(data)
 
@@ -137,7 +137,7 @@ class CreateCommand(ClimateCommand, show.ShowOne):
         return zip(*sorted(six.iteritems(data)))
 
 
-class UpdateCommand(ClimateCommand):
+class UpdateCommand(BlazarCommand):
     """Update resource's information."""
 
     api = 'reservation'
@@ -159,22 +159,22 @@ class UpdateCommand(ClimateCommand):
 
     def run(self, parsed_args):
         self.log.debug('run(%s)' % parsed_args)
-        climate_client = self.get_client()
+        blazar_client = self.get_client()
         body = self.args2body(parsed_args)
         if self.allow_names:
-            res_id = utils.find_resource_id_by_name_or_id(climate_client,
+            res_id = utils.find_resource_id_by_name_or_id(blazar_client,
                                                           self.resource,
                                                           parsed_args.id)
         else:
             res_id = parsed_args.id
-        resource_manager = getattr(climate_client, self.resource)
+        resource_manager = getattr(blazar_client, self.resource)
         resource_manager.update(res_id, **body)
         print(self.app.stdout, 'Updated %s: %s' % (self.resource,
                                                    parsed_args.id))
         return
 
 
-class DeleteCommand(ClimateCommand):
+class DeleteCommand(BlazarCommand):
     """Delete a given resource."""
 
     api = 'reservation'
@@ -194,10 +194,10 @@ class DeleteCommand(ClimateCommand):
 
     def run(self, parsed_args):
         self.log.debug('run(%s)' % parsed_args)
-        climate_client = self.get_client()
-        resource_manager = getattr(climate_client, self.resource)
+        blazar_client = self.get_client()
+        resource_manager = getattr(blazar_client, self.resource)
         if self.allow_names:
-            res_id = utils.find_resource_id_by_name_or_id(climate_client,
+            res_id = utils.find_resource_id_by_name_or_id(blazar_client,
                                                           self.resource,
                                                           parsed_args.id)
         else:
@@ -208,7 +208,7 @@ class DeleteCommand(ClimateCommand):
         return
 
 
-class ListCommand(ClimateCommand, lister.Lister):
+class ListCommand(BlazarCommand, lister.Lister):
     """List resources that belong to a given tenant."""
 
     api = 'reservation'
@@ -225,7 +225,7 @@ class ListCommand(ClimateCommand, lister.Lister):
                 params['sort_by'] = parsed_args.sort_by
             else:
                 msg = 'Invalid sort option %s' % parsed_args.sort_by
-                raise exception.ClimateClientException(msg)
+                raise exception.BlazarClientException(msg)
         return params
 
     def get_parser(self, prog_name):
@@ -233,10 +233,10 @@ class ListCommand(ClimateCommand, lister.Lister):
         return parser
 
     def retrieve_list(self, parsed_args):
-        """Retrieve a list of resources from Climate server"""
-        climate_client = self.get_client()
+        """Retrieve a list of resources from Blazar server"""
+        blazar_client = self.get_client()
         body = self.args2body(parsed_args)
-        resource_manager = getattr(climate_client, self.resource)
+        resource_manager = getattr(blazar_client, self.resource)
         data = resource_manager.list(**body)
         return data
 
@@ -260,7 +260,7 @@ class ListCommand(ClimateCommand, lister.Lister):
         return self.setup_columns(data, parsed_args)
 
 
-class ShowCommand(ClimateCommand, show.ShowOne):
+class ShowCommand(BlazarCommand, show.ShowOne):
     """Show information of a given resource."""
 
     api = 'reservation'
@@ -279,16 +279,16 @@ class ShowCommand(ClimateCommand, show.ShowOne):
 
     def get_data(self, parsed_args):
         self.log.debug('get_data(%s)' % parsed_args)
-        climate_client = self.get_client()
+        blazar_client = self.get_client()
 
         if self.allow_names:
-            res_id = utils.find_resource_id_by_name_or_id(climate_client,
+            res_id = utils.find_resource_id_by_name_or_id(blazar_client,
                                                           self.resource,
                                                           parsed_args.id)
         else:
             res_id = parsed_args.id
 
-        resource_manager = getattr(climate_client, self.resource)
+        resource_manager = getattr(blazar_client, self.resource)
         data = resource_manager.get(res_id)
         self.format_output_data(data)
         return zip(*sorted(six.iteritems(data)))

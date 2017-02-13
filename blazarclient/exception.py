@@ -14,10 +14,10 @@
 # limitations under the License.
 
 
-from climateclient.i18n import _
+from blazarclient.i18n import _
 
 
-class ClimateClientException(Exception):
+class BlazarClientException(Exception):
     """Base exception class."""
     message = _("An unknown exception occurred %s.")
     code = 500
@@ -34,17 +34,17 @@ class ClimateClientException(Exception):
         if not message:
             message = self.message % kwargs
 
-        super(ClimateClientException, self).__init__(message)
+        super(BlazarClientException, self).__init__(message)
 
 
-class CommandError(ClimateClientException):
+class CommandError(BlazarClientException):
     """Occurs if not all authentication vital options are set."""
     message = _("You have to provide all options like user name or tenant "
                 "id to make authentication possible.")
     code = 401
 
 
-class NotAuthorized(ClimateClientException):
+class NotAuthorized(BlazarClientException):
     """HTTP 401 - Not authorized.
 
     User have no enough rights to perform action.
@@ -53,26 +53,26 @@ class NotAuthorized(ClimateClientException):
     message = _("Not authorized request.")
 
 
-class NoClimateEndpoint(ClimateClientException):
-    """Occurs if no endpoint for Climate set in the Keystone."""
-    message = _("No publicURL endpoint for Climate found. Set endpoint "
-                "for Climate in the Keystone.")
+class NoBlazarEndpoint(BlazarClientException):
+    """Occurs if no endpoint for Blazar set in the Keystone."""
+    message = _("No publicURL endpoint for Blazar found. Set endpoint "
+                "for Blazar in the Keystone.")
     code = 404
 
 
-class NoUniqueMatch(ClimateClientException):
+class NoUniqueMatch(BlazarClientException):
     """Occurs if there are more than one appropriate resources."""
     message = _("There is no unique requested resource.")
     code = 409
 
 
-class UnsupportedVersion(ClimateClientException):
+class UnsupportedVersion(BlazarClientException):
     """Occurs if unsupported client version was requested."""
     message = _("Unsupported client version requested.")
     code = 406
 
 
-class IncorrectLease(ClimateClientException):
+class IncorrectLease(BlazarClientException):
     """Occurs if lease parameters are incorrect."""
     message = _("The lease parameters are incorrect.")
     code = 409

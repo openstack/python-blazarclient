@@ -18,8 +18,8 @@ import datetime
 import logging
 import re
 
-from climateclient import command
-from climateclient import exception
+from blazarclient import command
+from blazarclient import exception
 
 
 class ListLeases(command.ListCommand):
@@ -162,7 +162,7 @@ class CreateLease(command.CreateCommand):
             if not phys_res_info['min'] and not phys_res_info['max']:
                 raise exception.IncorrectLease(err_msg)
             # NOTE(sbauza): The resource type should be conf-driven mapped with
-            #               climate.conf file but that's potentially on another
+            #               blazar.conf file but that's potentially on another
             #               host
             phys_res_info['resource_type'] = 'physical:host'
             physical_reservations.append(phys_res_info)

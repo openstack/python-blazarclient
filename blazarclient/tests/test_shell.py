@@ -23,10 +23,10 @@ import fixtures
 import testtools
 
 #note(n.s.): you may need it later
-#from climateclient import client as climate_client
-#from climateclient import exception
-from climateclient import shell
-from climateclient import tests
+#from blazarclient import client as blazar_client
+#from blazarclient import exception
+from blazarclient import shell
+from blazarclient import tests
 
 FAKE_ENV = {'OS_USERNAME': 'username',
             'OS_PASSWORD': 'password',
@@ -34,17 +34,17 @@ FAKE_ENV = {'OS_USERNAME': 'username',
             'OS_AUTH_URL': 'http://no.where'}
 
 
-class ClimateShellTestCase(tests.TestCase):
+class BlazarShellTestCase(tests.TestCase):
 
     def make_env(self, exclude=None, fake_env=FAKE_ENV):
         env = dict((k, v) for k, v in fake_env.items() if k != exclude)
         self.useFixture(fixtures.MonkeyPatch('os.environ', env))
 
     def setUp(self):
-        super(ClimateShellTestCase, self).setUp()
+        super(BlazarShellTestCase, self).setUp()
 
         #Create shell for non-specific tests
-        self.climate_shell = shell.ClimateShell()
+        self.blazar_shell = shell.BlazarShell()
 
     def shell(self, argstr, exitcodes=(0,)):
         orig = sys.stdout
@@ -52,7 +52,7 @@ class ClimateShellTestCase(tests.TestCase):
         try:
             sys.stdout = six.StringIO()
             sys.stderr = six.StringIO()
-            _shell = shell.ClimateShell()
+            _shell = shell.BlazarShell()
             _shell.initialize_app(argstr.split())
         except SystemExit:
             exc_type, exc_value, exc_traceback = sys.exc_info()
@@ -86,7 +86,7 @@ class ClimateShellTestCase(tests.TestCase):
 
     @testtools.skip('lol')
     def test_authenticate_user(self):
-        obj = shell.ClimateShell()
+        obj = shell.BlazarShell()
         obj.initialize_app('list-leases')
         obj.options.os_token = 'aaaa-bbbb-cccc'
         obj.options.os_cacert = 'cert'
