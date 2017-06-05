@@ -37,28 +37,39 @@ class LeaseClientManager(base.BaseClientManager):
         return self._get('/leases/%s' % lease_id, 'lease')
 
     def update(self, lease_id, name=None, prolong_for=None, reduce_by=None,
-               advance_by=None, defer_by=None):
+               end_date=None, advance_by=None, defer_by=None, start_date=None):
         """Update attributes of the lease."""
         values = {}
         if name:
             values['name'] = name
 
-        lease_end_date_change = prolong_for or reduce_by
-        lease_start_date_change = defer_by or advance_by
+        lease_end_date_change = prolong_for or reduce_by or end_date
+        lease_start_date_change = defer_by or advance_by or start_date
         lease = None
 
         if lease_end_date_change:
             lease = self.get(lease_id)
-            self._add_lease_date(values, lease, 'end_date',
-                                 lease_end_date_change,
-                                 prolong_for is not None)
+            if end_date:
+                date = timeutils.parse_strtime(end_date, utils.API_DATE_FORMAT)
+                values['end_date'] = timeutils.strtime(date,
+                                                       utils.API_DATE_FORMAT)
+            else:
+                self._add_lease_date(values, lease, 'end_date',
+                                     lease_end_date_change,
+                                     prolong_for is not None)
 
         if lease_start_date_change:
             if lease is None:
                 lease = self.get(lease_id)
-            self._add_lease_date(values, lease, 'start_date',
-                                 lease_start_date_change,
-                                 defer_by is not None)
+            if start_date:
+                date = timeutils.parse_strtime(start_date,
+                                               utils.API_DATE_FORMAT)
+                values['start_date'] = timeutils.strtime(date,
+                                                         utils.API_DATE_FORMAT)
+            else:
+                self._add_lease_date(values, lease, 'start_date',
+                                     lease_start_date_change,
+                                     defer_by is not None)
 
         if not values:
             return _('No values to update passed.')
