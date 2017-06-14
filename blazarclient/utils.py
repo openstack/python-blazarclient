@@ -17,7 +17,6 @@ import datetime
 import json
 import os
 import re
-import six
 
 from blazarclient import exception
 from blazarclient.i18n import _
@@ -52,13 +51,13 @@ def to_primitive(value):
         return o
     elif isinstance(value, dict):
         o = {}
-        for k, v in six.iteritems(value):
+        for k, v in value.items():
             o[k] = to_primitive(v)
         return o
     elif isinstance(value, datetime.datetime):
         return str(value)
     elif hasattr(value, 'iteritems'):
-        return to_primitive(dict(six.iteritems(value)))
+        return to_primitive(dict(value.items()))
     elif hasattr(value, '__iter__'):
         return to_primitive(list(value))
     else:
