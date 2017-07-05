@@ -271,6 +271,10 @@ class UpdateLease(command.UpdateCommand):
             help='Time to reduce lease by',
             default=None
         )
+        group.add_argument(
+            '--end-date',
+            help='end date of the lease',
+            default=None)
 
         #defer-by and a 'future' advance-by are mutually exclusive
         group = parser.add_mutually_exclusive_group()
@@ -284,6 +288,10 @@ class UpdateLease(command.UpdateCommand):
             help='Time to advance the lease start',
             default=None
         )
+        group.add_argument(
+            '--start-date',
+            help='start date of the lease',
+            default=None)
 
         return parser
 
@@ -295,10 +303,14 @@ class UpdateLease(command.UpdateCommand):
             params['prolong_for'] = parsed_args.prolong_for
         if parsed_args.reduce_by:
             params['reduce_by'] = parsed_args.reduce_by
+        if parsed_args.end_date:
+            params['end_date'] = parsed_args.end_date
         if parsed_args.defer_by:
             params['defer_by'] = parsed_args.defer_by
         if parsed_args.advance_by:
             params['advance_by'] = parsed_args.advance_by
+        if parsed_args.start_date:
+            params['start_date'] = parsed_args.start_date
         return params
 
 
