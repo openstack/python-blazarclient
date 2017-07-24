@@ -131,7 +131,7 @@ class CreateCommand(BlazarCommand, show.ShowOne):
         self.format_output_data(data)
 
         if data:
-            print(self.app.stdout, 'Created a new %s:' % self.resource)
+            print('Created a new %s:' % self.resource, file=self.app.stdout)
         else:
             data = {'': ''}
         return zip(*sorted(six.iteritems(data)))
@@ -169,8 +169,8 @@ class UpdateCommand(BlazarCommand):
             res_id = parsed_args.id
         resource_manager = getattr(blazar_client, self.resource)
         resource_manager.update(res_id, **body)
-        print(self.app.stdout, 'Updated %s: %s' % (self.resource,
-                                                   parsed_args.id))
+        print('Updated %s: %s' % (self.resource, parsed_args.id),
+              file=self.app.stdout)
         return
 
 
@@ -203,8 +203,8 @@ class DeleteCommand(BlazarCommand):
         else:
             res_id = parsed_args.id
         resource_manager.delete(res_id)
-        print(self.app.stdout, 'Deleted %s: %s' % (self.resource,
-                                                   parsed_args.id))
+        print('Deleted %s: %s' % (self.resource, parsed_args.id),
+              file=self.app.stdout)
         return
 
 
