@@ -154,7 +154,7 @@ class BlazarShell(app.App):
             '--debug',
             default=False,
             action='store_true',
-            help='show tracebacks on errors')
+            help='Print debugging output')
 
         # Removes help action to defer its execution
         self.deferred_help_action = help_action
@@ -457,10 +457,13 @@ class BlazarShell(app.App):
 
         # Send higher-level messages to the console via stderr
         console = logging.StreamHandler(self.stderr)
-        console_level = {0: logging.WARNING,
-                         1: logging.INFO,
-                         2: logging.DEBUG}.get(self.options.verbose_level,
-                                               logging.DEBUG)
+        if self.options.debug:
+            console_level = logging.DEBUG
+        else:
+            console_level = {0: logging.WARNING,
+                             1: logging.INFO,
+                             2: logging.DEBUG}.get(self.options.verbose_level,
+                                                   logging.DEBUG)
         console.setLevel(console_level)
         if logging.DEBUG == console_level:
             formatter = logging.Formatter(self.DEBUG_MESSAGE_FORMAT)
