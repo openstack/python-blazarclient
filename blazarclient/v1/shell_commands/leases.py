@@ -18,6 +18,8 @@ import datetime
 import logging
 import re
 
+from oslo_utils import strutils
+
 from blazarclient import command
 from blazarclient import exception
 
@@ -162,11 +164,12 @@ class CreateLease(command.CreateCommand):
             if not (phys_res_info['min'] and phys_res_info['max']):
                 raise exception.IncorrectLease(err_msg)
 
-            try:
-                min_host = int(phys_res_info['min'])
-                max_host = int(phys_res_info['max'])
-            except Exception:
+            if not (strutils.is_int_like(phys_res_str['min']) and
+                    strutils.is_int_like(phys_res_str['max'])):
                 raise exception.IncorrectLease(err_msg)
+
+            min_host = int(phys_res_info['min'])
+            max_host = int(phys_res_info['max'])
 
             if min_host > max_host:
                 err_msg = ("Invalid physical-reservation argument '%s'. "
@@ -202,6 +205,8 @@ class CreateLease(command.CreateCommand):
                     k, v = kv_str.split("=", 1)
                 except ValueError:
                     raise exception.IncorrectLease(err_msg)
+                if strutils.is_int_like(v):
+                    v = int(v)
                 res_info[k] = v
             reservations.append(res_info)
         if reservations:
