@@ -164,8 +164,8 @@ class CreateLease(command.CreateCommand):
             if not (phys_res_info['min'] and phys_res_info['max']):
                 raise exception.IncorrectLease(err_msg)
 
-            if not (strutils.is_int_like(phys_res_str['min']) and
-                    strutils.is_int_like(phys_res_str['max'])):
+            if not (strutils.is_int_like(phys_res_info['min']) and
+                    strutils.is_int_like(phys_res_info['max'])):
                 raise exception.IncorrectLease(err_msg)
 
             min_host = int(phys_res_info['min'])
