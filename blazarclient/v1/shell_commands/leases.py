@@ -286,6 +286,14 @@ class UpdateLease(command.UpdateCommand):
             help='New name for the lease',
             default=None
         )
+        parser.add_argument(
+            '--reservation',
+            metavar="<key=value>",
+            action='append',
+            help='Reservation values to update. The reservation must be '
+                 'selected with the id=<reservation-id> key-value pair.',
+            default=None)
+
         #prolong-for and reduce_by are mutually exclusive
         group = parser.add_mutually_exclusive_group()
         group.add_argument(
@@ -343,6 +351,44 @@ class UpdateLease(command.UpdateCommand):
             params['advance_by'] = parsed_args.advance_by
         if parsed_args.start_date:
             params['start_date'] = parsed_args.start_date
+        if parsed_args.reservation:
+            keys = [
+                # General keys
+                'id',
+                # Keys for host reservation
+                'min', 'max', 'hypervisor_properties', 'resource_properties',
+                # Keys for instance reservation (update of instance reservation
+                # is NOT yet supported)
+            ]
+            params['reservations'] = []
+            reservations = []
+            for res_str in parsed_args.reservation:
+                err_msg = ("Invalid reservation argument '%s'. "
+                           "Reservation arguments must be of the form "
+                           "--reservation <key=value>" % res_str)
+                res_info = {}
+                prog = re.compile('^(?:(.*),)?(%s)=(.*)$' % '|'.join(keys))
+
+                def parse_params(params):
+                    match = prog.search(params)
+                    if match:
+                        k, v = match.group(2, 3)
+                        if strutils.is_int_like(v):
+                            v = int(v)
+                        res_info[k] = v
+                        if match.group(1) is not None:
+                            parse_params(match.group(1))
+
+                parse_params(res_str)
+                if res_info:
+                    if 'id' not in res_info:
+                        raise exception.IncorrectLease(
+                            'The key-value pair id=<reservation_id> is '
+                            'required for the --reservation argument')
+                    reservations.append(res_info)
+            if not reservations:
+                raise exception.IncorrectLease(err_msg)
+            params['reservations'] = reservations
         return params
 
 
