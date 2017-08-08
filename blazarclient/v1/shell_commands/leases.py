@@ -75,9 +75,16 @@ class CreateLease(command.CreateCommand):
             default=self.default_end
         )
         parser.add_argument(
+            '--before-end-date',
+            dest='before_end',
+            help='Time (YYYY-MM-DD HH:MM) UTC TZ for taking an action before '
+                 'the end of the lease (default: depends on system default)',
+            default=None
+        )
+        parser.add_argument(
             '--physical-reservation',
             metavar="<min=int,max=int,hypervisor_properties=str,"
-                    "resource_properties=str>",
+                    "resource_properties=str,before_end=str>",
             action='append',
             dest='physical_reservations',
             help='Create a reservation for physical compute hosts. '
@@ -86,7 +93,8 @@ class CreateLease(command.CreateCommand):
                  'min: minimum number of hosts to reserve. '
                  'max: maximum number of hosts to reserve. '
                  'hypervisor_properties: JSON string, see doc. '
-                 'resource_properties: JSON string, see doc. ',
+                 'resource_properties: JSON string, see doc. '
+                 'before_end: JSON string, see doc. ',
             default=[]
         )
         parser.add_argument(
@@ -129,6 +137,19 @@ class CreateLease(command.CreateCommand):
                 raise exception.IncorrectLease
         if parsed_args.start > parsed_args.end:
             raise exception.IncorrectLease
+
+        if parsed_args.before_end:
+            try:
+                parsed_args.before_end = datetime.datetime.strptime(
+                    parsed_args.before_end, '%Y-%m-%d %H:%M')
+            except ValueError:
+                raise exception.IncorrectLease
+            if (parsed_args.before_end < parsed_args.start
+                    or parsed_args.end < parsed_args.before_end):
+                raise exception.IncorrectLease
+            params['before_end'] = datetime.datetime.strftime(
+                parsed_args.before_end, '%Y-%m-%d %H:%M')
+
         params['start'] = datetime.datetime.strftime(parsed_args.start,
                                                      '%Y-%m-%d %H:%M')
         params['end'] = datetime.datetime.strftime(parsed_args.end,
@@ -142,10 +163,11 @@ class CreateLease(command.CreateCommand):
             err_msg = ("Invalid physical-reservation argument '%s'. "
                        "Reservation arguments must be of the "
                        "form --physical-reservation <min=int,max=int,"
-                       "hypervisor_properties=str,resource_properties=str>"
+                       "hypervisor_properties=str,resource_properties=str,"
+                       "before_end=str>"
                        % phys_res_str)
             phys_res_info = {"min": "", "max": "", "hypervisor_properties": "",
-                             "resource_properties": ""}
+                             "resource_properties": "", "before_end": None}
             prog = re.compile('^(?:(.*),)?(%s)=(.*)$'
                               % "|".join(phys_res_info.keys()))
 
@@ -188,6 +210,8 @@ class CreateLease(command.CreateCommand):
                            % phys_res_str)
                 raise exception.IncorrectLease(err_msg)
 
+            if phys_res_info['before_end'] is None:
+                phys_res_info.pop('before_end')
             # NOTE(sbauza): The resource type should be conf-driven mapped with
             #               blazar.conf file but that's potentially on another
             #               host

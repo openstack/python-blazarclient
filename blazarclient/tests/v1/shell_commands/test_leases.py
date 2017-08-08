@@ -32,6 +32,7 @@ class CreateLeaseTestCase(tests.TestCase):
         args = argparse.Namespace(
             start='2020-07-24 20:00',
             end='2020-08-09 22:30',
+            before_end='2020-08-09 21:30',
             events=[],
             name='lease-test',
             reservations=[],
@@ -42,12 +43,14 @@ class CreateLeaseTestCase(tests.TestCase):
                 '["and", [">=", "$vcpus", "2"], '
                 '[">=", "$memory_mb", "2048"]],'
                 'resource_properties='
-                '["==", "$extra_key", "extra_value"]'
+                '["==", "$extra_key", "extra_value"],'
+                'before_end=default'
             ]
         )
         expected = {
             'start': '2020-07-24 20:00',
             'end': '2020-08-09 22:30',
+            'before_end': '2020-08-09 21:30',
             'events': [],
             'name': 'lease-test',
             'reservations': [
@@ -59,7 +62,8 @@ class CreateLeaseTestCase(tests.TestCase):
                         '[">=", "$memory_mb", "2048"]]',
                     'resource_properties':
                         '["==", "$extra_key", "extra_value"]',
-                    'resource_type': 'physical:host'
+                    'resource_type': 'physical:host',
+                    'before_end': 'default'
                 }
             ]
         }
@@ -69,6 +73,7 @@ class CreateLeaseTestCase(tests.TestCase):
         args = argparse.Namespace(
             start='2020-07-24 20:00',
             end='2020-08-09 22:30',
+            before_end='2020-08-09 21:30',
             events=[],
             name='lease-test',
             reservations=[],
@@ -91,6 +96,7 @@ class CreateLeaseTestCase(tests.TestCase):
         args = argparse.Namespace(
             start='2020-07-24 20:00',
             end='2020-08-09 22:30',
+            before_end='2020-08-09 21:30',
             events=[],
             name='lease-test',
             reservations=[],

@@ -23,10 +23,11 @@ from blazarclient import utils
 class LeaseClientManager(base.BaseClientManager):
     """Manager for the lease connected requests."""
 
-    def create(self, name, start, end, reservations, events):
+    def create(self, name, start, end, reservations, events, before_end=None):
         """Creates lease from values passed."""
         values = {'name': name, 'start_date': start, 'end_date': end,
-                  'reservations': reservations, 'events': events}
+                  'reservations': reservations, 'events': events,
+                  'before_end_date': before_end}
 
         return self._create('/leases', values, 'lease')
 
