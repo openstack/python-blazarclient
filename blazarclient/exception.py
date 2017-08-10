@@ -76,3 +76,9 @@ class IncorrectLease(BlazarClientException):
     """Occurs if lease parameters are incorrect."""
     message = _("The lease parameters are incorrect.")
     code = 409
+
+
+class DuplicatedLeaseParameters(BlazarClientException):
+    """Occurs if lease parameters are duplicated."""
+    message = _("The lease parameters are duplicated.")
+    code = 400

@@ -146,19 +146,22 @@ class CreateLease(command.CreateCommand):
                        % phys_res_str)
             phys_res_info = {"min": "", "max": "", "hypervisor_properties": "",
                              "resource_properties": ""}
-            prog = re.compile('^(\w+)=(\w+|\[[^]]+\])(?:,(.+))?$')
+            prog = re.compile('^(?:(.*),)?(%s)=(.*)$'
+                              % "|".join(phys_res_info.keys()))
 
             def parse_params(params):
                 match = prog.search(params)
                 if match:
                     self.log.info("Matches: %s", match.groups())
-                    k, v = match.group(1, 2)
-                    if k in phys_res_info:
+                    k, v = match.group(2, 3)
+                    if not phys_res_info[k]:
                         phys_res_info[k] = v
                     else:
-                        raise exception.IncorrectLease(err_msg)
-                    if len(match.groups()) == 3 and match.group(3) is not None:
-                        parse_params(match.group(3))
+                        raise exception.DuplicatedLeaseParameters(err_msg)
+                    if match.group(1) is not None:
+                        parse_params(match.group(1))
+                else:
+                    raise exception.IncorrectLease(err_msg)
 
             parse_params(phys_res_str)
             if not (phys_res_info['min'] and phys_res_info['max']):
