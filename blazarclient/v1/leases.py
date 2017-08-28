@@ -13,15 +13,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from keystoneauth1 import adapter
 from oslo_utils import timeutils
 
-from blazarclient import base
 from blazarclient.i18n import _
 from blazarclient import utils
 
 
-class LeaseClientManager(base.BaseClientManager):
+class LeaseClientManager(adapter.LegacyJsonAdapter):
     """Manager for the lease connected requests."""
+
+    client_name = 'python-blazarclient'
 
     def create(self, name, start, end, reservations, events, before_end=None):
         """Creates lease from values passed."""
@@ -29,13 +31,16 @@ class LeaseClientManager(base.BaseClientManager):
                   'reservations': reservations, 'events': events,
                   'before_end_date': before_end}
 
-        return self._create('/leases', values, 'lease')
+        resp, body = self.post('/leases', body=values)
+        return body['lease']
 
     def get(self, lease_id):
         """Describes lease specifications such as name, status and locked
         condition.
         """
-        return self._get('/leases/%s' % lease_id, 'lease')
+        resp, body = super(LeaseClientManager,
+                           self).get('/leases/%s' % lease_id)
+        return body['lease']
 
     def update(self, lease_id, name=None, prolong_for=None, reduce_by=None,
                end_date=None, advance_by=None, defer_by=None, start_date=None,
@@ -76,16 +81,18 @@ class LeaseClientManager(base.BaseClientManager):
 
         if not values:
             return _('No values to update passed.')
-        return self._update('/leases/%s' % lease_id, values,
-                            response_key='lease')
+        resp, body = self.put('/leases/%s' % lease_id, body=values)
+        return body['lease']
 
     def delete(self, lease_id):
         """Deletes lease with specified ID."""
-        self._delete('/leases/%s' % lease_id)
+        resp, body = super(LeaseClientManager,
+                           self).delete('/leases/%s' % lease_id)
 
     def list(self, sort_by=None):
         """List all leases."""
-        leases = self._get('/leases', 'leases')
+        resp, body = super(LeaseClientManager, self).get('/leases')
+        leases = body['leases']
         if sort_by:
             leases = sorted(leases, key=lambda l: l[sort_by])
         return leases

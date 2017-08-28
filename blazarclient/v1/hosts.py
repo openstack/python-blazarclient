@@ -13,38 +13,46 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from blazarclient import base
+from keystoneauth1 import adapter
+
 from blazarclient.i18n import _
 
 
-class ComputeHostClientManager(base.BaseClientManager):
+class ComputeHostClientManager(adapter.LegacyJsonAdapter):
     """Manager for the ComputeHost connected requests."""
+
+    client_name = 'python-blazarclient'
 
     def create(self, name, **kwargs):
         """Creates host from values passed."""
         values = {'name': name}
         values.update(**kwargs)
-
-        return self._create('/os-hosts', values, response_key='host')
+        resp, body = self.post('/os-hosts', body=values)
+        return body['host']
 
     def get(self, host_id):
         """Describes host specifications such as name and details."""
-        return self._get('/os-hosts/%s' % host_id, 'host')
+        resp, body = super(ComputeHostClientManager,
+                           self).get('/os-hosts/%s' % host_id)
+        return body['host']
 
     def update(self, host_id, values):
         """Update attributes of the host."""
         if not values:
             return _('No values to update passed.')
-        return self._update('/os-hosts/%s' % host_id, values,
-                            response_key='host')
+        resp, body = self.put('/os-hosts/%s' % host_id, body=values)
+        return body['host']
 
     def delete(self, host_id):
         """Deletes host with specified ID."""
-        self._delete('/os-hosts/%s' % host_id)
+        resp, body = super(ComputeHostClientManager,
+                           self).delete('/os-hosts/%s' % host_id)
 
     def list(self, sort_by=None):
         """List all hosts."""
-        hosts = self._get('/os-hosts', 'hosts')
+        resp, body = super(ComputeHostClientManager,
+                           self).get('/os-hosts')
+        hosts = body['hosts']
         if sort_by:
             hosts = sorted(hosts, key=lambda l: l[sort_by])
         return hosts

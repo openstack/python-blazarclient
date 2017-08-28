@@ -29,8 +29,11 @@ from blazarclient import shell
 from blazarclient import tests
 
 FAKE_ENV = {'OS_USERNAME': 'username',
+            'OS_USER_DOMAIN_ID': 'user_domain_id',
             'OS_PASSWORD': 'password',
             'OS_TENANT_NAME': 'tenant_name',
+            'OS_PROJECT_NAME': 'project_name',
+            'OS_PROJECT_DOMAIN_ID': 'project_domain_id',
             'OS_AUTH_URL': 'http://no.where'}
 
 

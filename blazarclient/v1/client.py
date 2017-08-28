@@ -31,11 +31,15 @@ class Client(object):
         ...
     """
 
-    def __init__(self, blazar_url, auth_token):
-        self.blazar_url = blazar_url
-        self.auth_token = auth_token
+    def __init__(self, session, *args, **kwargs):
+        self.session = session
+        self.version = '1'
 
-        self.lease = leases.LeaseClientManager(self.blazar_url,
-                                               self.auth_token)
-        self.host = hosts.ComputeHostClientManager(self.blazar_url,
-                                                   self.auth_token)
+        self.lease = leases.LeaseClientManager(session=self.session,
+                                               version=self.version,
+                                               *args,
+                                               **kwargs)
+        self.host = hosts.ComputeHostClientManager(session=self.session,
+                                                   version=self.version,
+                                                   *args,
+                                                   **kwargs)
