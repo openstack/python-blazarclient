@@ -53,8 +53,7 @@ class LeaseClientManager(base.BaseClientManager):
             lease = self.get(lease_id)
             if end_date:
                 date = timeutils.parse_strtime(end_date, utils.API_DATE_FORMAT)
-                values['end_date'] = timeutils.strtime(date,
-                                                       utils.API_DATE_FORMAT)
+                values['end_date'] = date.strftime(utils.API_DATE_FORMAT)
             else:
                 self._add_lease_date(values, lease, 'end_date',
                                      lease_end_date_change,
@@ -66,8 +65,7 @@ class LeaseClientManager(base.BaseClientManager):
             if start_date:
                 date = timeutils.parse_strtime(start_date,
                                                utils.API_DATE_FORMAT)
-                values['start_date'] = timeutils.strtime(date,
-                                                         utils.API_DATE_FORMAT)
+                values['start_date'] = date.strftime(utils.API_DATE_FORMAT)
             else:
                 self._add_lease_date(values, lease, 'start_date',
                                      lease_start_date_change,
@@ -98,5 +96,4 @@ class LeaseClientManager(base.BaseClientManager):
             pos_sign=positive_delta)
         date = timeutils.parse_strtime(lease[key],
                                        utils.LEASE_DATE_FORMAT)
-        values[key] = timeutils.strtime(date + delta_sec,
-                                        utils.API_DATE_FORMAT)
+        values[key] = (date + delta_sec).strftime(utils.API_DATE_FORMAT)
