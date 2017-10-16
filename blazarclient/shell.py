@@ -25,8 +25,8 @@ import sys
 
 from cliff import app
 from cliff import commandmanager
-from keystoneclient import client as keystone_client
-from keystoneclient import exceptions as keystone_exceptions
+from keystoneauth1 import identity
+from keystoneauth1 import session
 from oslo_utils import encodeutils
 import six
 
@@ -196,6 +196,36 @@ class BlazarShell(app.App):
             '--os_auth_url',
             help=argparse.SUPPRESS)
         parser.add_argument(
+            '--os-project-name', metavar='<auth-project-name>',
+            default=env('OS_PROJECT_NAME'),
+            help='Authentication project name (Env: OS_PROJECT_NAME)')
+        parser.add_argument(
+            '--os_project_name',
+            help=argparse.SUPPRESS)
+        parser.add_argument(
+            '--os-project-id', metavar='<auth-project-id>',
+            default=env('OS_PROJECT_ID'),
+            help='Authentication project ID (Env: OS_PROJECT_ID)')
+        parser.add_argument(
+            '--os_project_id',
+            help=argparse.SUPPRESS)
+        parser.add_argument(
+            '--os-project-domain-name', metavar='<auth-project-domain-name>',
+            default=env('OS_PROJECT_DOMAIN_NAME'),
+            help='Authentication project domain name '
+                 '(Env: OS_PROJECT_DOMAIN_NAME)')
+        parser.add_argument(
+            '--os_project_domain_name',
+            help=argparse.SUPPRESS)
+        parser.add_argument(
+            '--os-project-domain-id', metavar='<auth-project-domain-id>',
+            default=env('OS_PROJECT_DOMAIN_ID'),
+            help='Authentication project domain ID '
+                 '(Env: OS_PROJECT_DOMAIN_ID)')
+        parser.add_argument(
+            '--os_project_domain_id',
+            help=argparse.SUPPRESS)
+        parser.add_argument(
             '--os-tenant-name', metavar='<auth-tenant-name>',
             default=env('OS_TENANT_NAME'),
             help='Authentication tenant name (Env: OS_TENANT_NAME)')
@@ -212,6 +242,20 @@ class BlazarShell(app.App):
             help='Authentication username (Env: OS_USERNAME)')
         parser.add_argument(
             '--os_username',
+            help=argparse.SUPPRESS)
+        parser.add_argument(
+            '--os-user-domain-name', metavar='<auth-user-domain-name>',
+            default=env('OS_USER_DOMAIN_NAME'),
+            help='Authentication user domain name (Env: OS_USER_DOMAIN_NAME)')
+        parser.add_argument(
+            '--os_user_domain_name',
+            help=argparse.SUPPRESS)
+        parser.add_argument(
+            '--os-user-domain-id', metavar='<auth-user-domain-id>',
+            default=env('OS_USER_DOMAIN_ID'),
+            help='Authentication user domain ID (Env: OS_USER_DOMAIN_ID)')
+        parser.add_argument(
+            '--os_user_domain_id',
             help=argparse.SUPPRESS)
         parser.add_argument(
             '--os-password', metavar='<auth-password>',
@@ -234,6 +278,10 @@ class BlazarShell(app.App):
         parser.add_argument(
             '--os_token',
             help=argparse.SUPPRESS)
+        parser.add_argument(
+            '--service-type', metavar='<service-type>',
+            default=env('BLAZAR_SERVICE_TYPE', default='reservation'),
+            help='Defaults to env[BLAZAR_SERVICE_TYPE] or reservation.')
         parser.add_argument(
             '--endpoint-type', metavar='<endpoint-type>',
             default=env('OS_ENDPOINT_TYPE', default='publicURL'),
@@ -373,61 +421,45 @@ class BlazarShell(app.App):
         return result
 
     def authenticate_user(self):
-        """Make sure the user has provided all of the authentication
-        info we need.
-        """
-        if not self.options.os_token:
-            if not self.options.os_username:
-                raise exception.CommandError(
-                    "You must provide a username via"
-                    " either --os-username or env[OS_USERNAME]")
+        """Authenticate user and set client by using passed params."""
 
-            if not self.options.os_password:
-                raise exception.CommandError(
-                    "You must provide a password via"
-                    " either --os-password or env[OS_PASSWORD]")
+        if self.options.os_token:
+            auth = identity.Token(
+                auth_url=self.options.os_auth_url,
+                token=self.options.os_token,
+                tenant_id=self.options.os_tenant_id,
+                tenant_name=self.options.os_tenant_name,
+                project_id=self.options.os_project_id,
+                project_name=self.options.os_project_name,
+                project_domain_id=self.options.os_project_domain_id,
+                project_domain_name=self.options.os_project_domain_name
+            )
+        else:
+            auth = identity.Password(
+                auth_url=self.options.os_auth_url,
+                username=self.options.os_username,
+                tenant_id=self.options.os_tenant_id,
+                tenant_name=self.options.os_tenant_name,
+                password=self.options.os_password,
+                project_id=self.options.os_project_id,
+                project_name=self.options.os_project_name,
+                project_domain_id=self.options.os_project_domain_id,
+                project_domain_name=self.options.os_project_domain_name,
+                user_domain_id=self.options.os_user_domain_id,
+                user_domain_name=self.options.os_user_domain_name
+            )
 
-            if (not self.options.os_tenant_name and
-                    not self.options.os_tenant_id):
-                raise exception.CommandError(
-                    "You must provide a tenant_name or tenant_id via"
-                    "  --os-tenant-name, env[OS_TENANT_NAME]"
-                    "  --os-tenant-id, or via env[OS_TENANT_ID]")
-
-            if not self.options.os_auth_url:
-                raise exception.CommandError(
-                    "You must provide an auth url via"
-                    " either --os-auth-url or via env[OS_AUTH_URL]")
-
-        keystone = keystone_client.Client(
-            token=self.options.os_token,
-            auth_url=self.options.os_auth_url,
-            tenant_id=self.options.os_tenant_id,
-            tenant_name=self.options.os_tenant_name,
-            password=self.options.os_password,
-            region_name=self.options.os_region_name,
-            username=self.options.os_username,
-            insecure=self.options.insecure,
-            cert=self.options.os_cacert
+        sess = session.Session(
+            auth=auth,
+            verify=(self.options.os_cacert or not self.options.insecure)
         )
 
-        auth = keystone.authenticate()
-
-        if auth:
-            try:
-                blazar_url = keystone.service_catalog.url_for(
-                    service_type='reservation'
-                )
-            except keystone_exceptions.EndpointNotFound:
-                raise exception.NoBlazarEndpoint()
-        else:
-            raise exception.NotAuthorized("User %s is not authorized." %
-                                          self.options.os_username)
-
-        client = blazar_client.Client(self.options.os_reservation_api_version,
-                                      blazar_url=blazar_url,
-                                      auth_token=keystone.auth_token)
-        self.client = client
+        self.client = blazar_client.Client(
+            self.options.os_reservation_api_version,
+            session=sess,
+            service_type=self.options.service_type,
+            interface=self.options.endpoint_type
+        )
         return
 
     def initialize_app(self, argv):
