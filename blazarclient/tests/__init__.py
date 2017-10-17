@@ -14,9 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
+import fixtures
 from oslotest import base
-from oslotest import mockpatch
 
 
 class TestCase(base.BaseTestCase):
@@ -24,5 +23,5 @@ class TestCase(base.BaseTestCase):
 
     def patch(self, obj, attr):
         """Returns a Mocked object on the patched attribute."""
-        mockfixture = self.useFixture(mockpatch.PatchObject(obj, attr))
+        mockfixture = self.useFixture(fixtures.MockPatchObject(obj, attr))
         return mockfixture.mock
