@@ -13,6 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import logging
 
 from blazarclient.v1 import hosts
 from blazarclient.v1 import leases
@@ -31,15 +32,26 @@ class Client(object):
         ...
     """
 
-    def __init__(self, session, *args, **kwargs):
-        self.session = session
-        self.version = '1'
+    version = '1'
 
-        self.lease = leases.LeaseClientManager(session=self.session,
+    def __init__(self, blazar_url=None, auth_token=None, session=None,
+                 **kwargs):
+        self.blazar_url = blazar_url
+        self.auth_token = auth_token
+        self.session = session
+
+        if not self.session:
+            logging.warning('Use a keystoneauth session object for the '
+                            'authentication. The authentication with '
+                            'blazar_url and auth_token is deprecated.')
+
+        self.lease = leases.LeaseClientManager(blazar_url=self.blazar_url,
+                                               auth_token=self.auth_token,
+                                               session=self.session,
                                                version=self.version,
-                                               *args,
                                                **kwargs)
-        self.host = hosts.ComputeHostClientManager(session=self.session,
+        self.host = hosts.ComputeHostClientManager(blazar_url=self.blazar_url,
+                                                   auth_token=self.auth_token,
+                                                   session=self.session,
                                                    version=self.version,
-                                                   *args,
                                                    **kwargs)
