@@ -82,3 +82,11 @@ class DuplicatedLeaseParameters(BlazarClientException):
     """Occurs if lease parameters are duplicated."""
     message = _("The lease parameters are duplicated.")
     code = 400
+
+
+class InsufficientAuthInfomation(BlazarClientException):
+    """Occurs if the auth info passed to blazar client is insufficient."""
+    message = _("The passed arguments are insufficient "
+                "for the authentication. The instance of "
+                "keystoneauth1.session.Session class is required.")
+    code = 400

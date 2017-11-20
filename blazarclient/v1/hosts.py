@@ -13,45 +13,41 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from keystoneauth1 import adapter
-
+from blazarclient import base
 from blazarclient.i18n import _
 
 
-class ComputeHostClientManager(adapter.LegacyJsonAdapter):
+class ComputeHostClientManager(base.BaseClientManager):
     """Manager for the ComputeHost connected requests."""
-
-    client_name = 'python-blazarclient'
 
     def create(self, name, **kwargs):
         """Creates host from values passed."""
         values = {'name': name}
         values.update(**kwargs)
-        resp, body = self.post('/os-hosts', body=values)
+        resp, body = self.request_manager.post('/os-hosts', body=values)
         return body['host']
 
     def get(self, host_id):
         """Describes host specifications such as name and details."""
-        resp, body = super(ComputeHostClientManager,
-                           self).get('/os-hosts/%s' % host_id)
+        resp, body = self.request_manager.get('/os-hosts/%s' % host_id)
         return body['host']
 
     def update(self, host_id, values):
         """Update attributes of the host."""
         if not values:
             return _('No values to update passed.')
-        resp, body = self.put('/os-hosts/%s' % host_id, body=values)
+        resp, body = self.request_manager.put(
+            '/os-hosts/%s' % host_id, body=values
+        )
         return body['host']
 
     def delete(self, host_id):
         """Deletes host with specified ID."""
-        resp, body = super(ComputeHostClientManager,
-                           self).delete('/os-hosts/%s' % host_id)
+        resp, body = self.request_manager.delete('/os-hosts/%s' % host_id)
 
     def list(self, sort_by=None):
         """List all hosts."""
-        resp, body = super(ComputeHostClientManager,
-                           self).get('/os-hosts')
+        resp, body = self.request_manager.get('/os-hosts')
         hosts = body['hosts']
         if sort_by:
             hosts = sorted(hosts, key=lambda l: l[sort_by])
