@@ -84,7 +84,7 @@ class BlazarCommand(OpenStackCommand):
         return parser
 
     def format_output_data(self, data):
-        for k, v in six.iteritems(data):
+        for k, v in data.items():
             if isinstance(v, six.text_type):
                 try:
                     # Deserialize if possible into dict, lists, tuples...
@@ -134,7 +134,7 @@ class CreateCommand(BlazarCommand, show.ShowOne):
             print('Created a new %s:' % self.resource, file=self.app.stdout)
         else:
             data = {'': ''}
-        return zip(*sorted(six.iteritems(data)))
+        return zip(*sorted(data.items()))
 
 
 class UpdateCommand(BlazarCommand):
@@ -291,4 +291,4 @@ class ShowCommand(BlazarCommand, show.ShowOne):
         resource_manager = getattr(blazar_client, self.resource)
         data = resource_manager.get(res_id)
         self.format_output_data(data)
-        return zip(*sorted(six.iteritems(data)))
+        return zip(*sorted(data.items()))
