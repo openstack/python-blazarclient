@@ -357,8 +357,8 @@ class UpdateLease(command.UpdateCommand):
                 'id',
                 # Keys for host reservation
                 'min', 'max', 'hypervisor_properties', 'resource_properties',
-                # Keys for instance reservation (update of instance reservation
-                # is NOT yet supported)
+                # Keys for instance reservation
+                'vcpus', 'memory_mb', 'disk_gb', 'amount', 'affinity'
             ]
             params['reservations'] = []
             reservations = []
