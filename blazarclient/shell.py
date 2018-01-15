@@ -511,7 +511,7 @@ class BlazarShell(app.App):
 
 def main(argv=sys.argv[1:]):
     try:
-        return BlazarShell().run(map(encodeutils.safe_decode, argv))
+        return BlazarShell().run(list(map(encodeutils.safe_decode, argv)))
     except exception.BlazarClientException:
         return 1
     except Exception as e:

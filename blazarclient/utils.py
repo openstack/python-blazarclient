@@ -14,9 +14,10 @@
 # limitations under the License.
 
 import datetime
-import json
 import os
 import re
+
+from oslo_serialization import jsonutils as json
 
 from blazarclient import exception
 from blazarclient.i18n import _
