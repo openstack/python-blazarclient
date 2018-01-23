@@ -84,6 +84,7 @@ class CreateHost(command.CreateCommand):
 class UpdateHost(command.UpdateCommand):
     """Update attributes of a host."""
     resource = 'host'
+    json_indent = 4
     allow_names = False
     log = logging.getLogger(__name__ + '.UpdateHost')
 

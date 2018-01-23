@@ -50,6 +50,7 @@ class ShowLease(command.ShowCommand):
 class CreateLease(command.CreateCommand):
     """Create a lease."""
     resource = 'lease'
+    json_indent = 4
     log = logging.getLogger(__name__ + '.CreateLease')
     default_start = datetime.datetime.utcnow()
     default_end = default_start + datetime.timedelta(days=1)
@@ -277,6 +278,7 @@ class CreateLease(command.CreateCommand):
 class UpdateLease(command.UpdateCommand):
     """Update a lease."""
     resource = 'lease'
+    json_indent = 4
     log = logging.getLogger(__name__ + '.UpdateLease')
 
     def get_parser(self, prog_name):
