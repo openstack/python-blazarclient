@@ -13,9 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import json
-
 from keystoneauth1 import adapter
+from oslo_serialization import jsonutils
 import requests
 
 from blazarclient import exception
@@ -89,13 +88,13 @@ class RequestManager(object):
 
         if 'body' in kwargs:
             kwargs['headers']['Content-Type'] = 'application/json'
-            kwargs['data'] = json.dumps(kwargs['body'])
+            kwargs['data'] = jsonutils.dump_as_bytes(kwargs['body'])
             del kwargs['body']
 
         resp = requests.request(method, self.blazar_url + url, **kwargs)
 
         try:
-            body = json.loads(resp.text)
+            body = jsonutils.loads(resp.text)
         except ValueError:
             body = None
 
