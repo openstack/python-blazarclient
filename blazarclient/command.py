@@ -26,6 +26,11 @@ from cliff import show
 from blazarclient import exception
 from blazarclient import utils
 
+HEX_ELEM = '[0-9A-Fa-f]'
+UUID_PATTERN = '-'.join([HEX_ELEM + '{8}', HEX_ELEM + '{4}',
+                         HEX_ELEM + '{4}', HEX_ELEM + '{4}',
+                         HEX_ELEM + '{12}'])
+
 
 class OpenStackCommand(command.Command):
     """Base class for OpenStack commands."""
@@ -65,6 +70,8 @@ class BlazarCommand(OpenStackCommand):
     json_indent = None
     resource = None
     allow_names = True
+    name_key = None
+    id_pattern = UUID_PATTERN
 
     def __init__(self, app, app_args):
         super(BlazarCommand, self).__init__(app, app_args)
@@ -164,7 +171,9 @@ class UpdateCommand(BlazarCommand):
         if self.allow_names:
             res_id = utils.find_resource_id_by_name_or_id(blazar_client,
                                                           self.resource,
-                                                          parsed_args.id)
+                                                          parsed_args.id,
+                                                          self.name_key,
+                                                          self.id_pattern)
         else:
             res_id = parsed_args.id
         resource_manager = getattr(blazar_client, self.resource)
@@ -199,7 +208,9 @@ class DeleteCommand(BlazarCommand):
         if self.allow_names:
             res_id = utils.find_resource_id_by_name_or_id(blazar_client,
                                                           self.resource,
-                                                          parsed_args.id)
+                                                          parsed_args.id,
+                                                          self.name_key,
+                                                          self.id_pattern)
         else:
             res_id = parsed_args.id
         resource_manager.delete(res_id)
@@ -284,7 +295,9 @@ class ShowCommand(BlazarCommand, show.ShowOne):
         if self.allow_names:
             res_id = utils.find_resource_id_by_name_or_id(blazar_client,
                                                           self.resource,
-                                                          parsed_args.id)
+                                                          parsed_args.id,
+                                                          self.name_key,
+                                                          self.id_pattern)
         else:
             res_id = parsed_args.id
 

@@ -22,10 +22,6 @@ from oslo_serialization import jsonutils as json
 from blazarclient import exception
 from blazarclient.i18n import _
 
-HEX_ELEM = '[0-9A-Fa-f]'
-UUID_PATTERN = '-'.join([HEX_ELEM + '{8}', HEX_ELEM + '{4}',
-                         HEX_ELEM + '{4}', HEX_ELEM + '{4}',
-                         HEX_ELEM + '{12}'])
 ELAPSED_TIME_REGEX = '^(\d+)([s|m|h|d])$'
 
 LEASE_DATE_FORMAT = '%Y-%m-%dT%H:%M:%S.%f'
@@ -106,9 +102,10 @@ def get_item_properties(item, fields, mixed_case_fields=None, formatters=None):
     return tuple(row)
 
 
-def find_resource_id_by_name_or_id(client, resource, name_or_id):
+def find_resource_id_by_name_or_id(client, resource, name_or_id,
+                                   name_key, id_pattern):
     resource_manager = getattr(client, resource)
-    is_id = re.match(UUID_PATTERN, name_or_id)
+    is_id = re.match(id_pattern, name_or_id)
     if is_id:
         resources = resource_manager.list()
         for resource in resources:
@@ -116,17 +113,18 @@ def find_resource_id_by_name_or_id(client, resource, name_or_id):
                 return name_or_id
         raise exception.BlazarClientException('No resource found with ID %s' %
                                               name_or_id)
-    return _find_resource_id_by_name(client, resource, name_or_id)
+    return _find_resource_id_by_name(client, resource, name_or_id, name_key)
 
 
-def _find_resource_id_by_name(client, resource, name):
+def _find_resource_id_by_name(client, resource, name, name_key):
     resource_manager = getattr(client, resource)
     resources = resource_manager.list()
 
     named_resources = []
+    key = name_key if name_key else 'name'
 
     for resource in resources:
-        if resource['name'] == name:
+        if resource[key] == name:
             named_resources.append(resource['id'])
     if len(named_resources) > 1:
         raise exception.NoUniqueMatch(message="There are more than one "

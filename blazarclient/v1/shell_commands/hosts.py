@@ -17,6 +17,8 @@ import logging
 
 from blazarclient import command
 
+HOST_ID_PATTERN = '^[0-9]+$'
+
 
 class ListHosts(command.ListCommand):
     """Print a list of hosts."""
@@ -39,9 +41,8 @@ class ShowHost(command.ShowCommand):
     """Show host details."""
     resource = 'host'
     json_indent = 4
-    # NOTE(sbauza): We can't find by name as there is currently no column
-    #  called 'name' but rather 'hypervisor_hostname'
-    allow_names = False
+    name_key = 'hypervisor_hostname'
+    id_pattern = HOST_ID_PATTERN
     log = logging.getLogger(__name__ + '.ShowHost')
 
 
@@ -85,8 +86,9 @@ class UpdateHost(command.UpdateCommand):
     """Update attributes of a host."""
     resource = 'host'
     json_indent = 4
-    allow_names = False
     log = logging.getLogger(__name__ + '.UpdateHost')
+    name_key = 'hypervisor_hostname'
+    id_pattern = HOST_ID_PATTERN
 
     def get_parser(self, prog_name):
         parser = super(UpdateHost, self).get_parser(prog_name)
@@ -115,7 +117,6 @@ class UpdateHost(command.UpdateCommand):
 class DeleteHost(command.DeleteCommand):
     """Delete a host."""
     resource = 'host'
-    # NOTE(sbauza): We can't find by name as there is currently no column
-    #  called 'name' but rather 'hypervisor_hostname'
-    allow_names = False
     log = logging.getLogger(__name__ + '.DeleteHost')
+    name_key = 'hypervisor_hostname'
+    id_pattern = HOST_ID_PATTERN
