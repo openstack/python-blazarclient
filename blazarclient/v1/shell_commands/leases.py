@@ -24,6 +24,30 @@ from blazarclient import command
 from blazarclient import exception
 
 
+CREATE_RESERVATION_KEYS = {
+    "physical:host": {
+        "min": "",
+        "max": "",
+        "hypervisor_properties": "",
+        "resource_properties": "",
+        "before_end": None,
+        "resource_type": 'physical:host'
+    },
+    "virtual:instance": {
+        "vcpus": "",
+        "memory_mb": "",
+        "disk_gb": "",
+        "amount": "",
+        "affinity": "",
+        "resource_properties": "",
+        "resource_type": 'virtual:instance'
+    },
+    "others": {
+        ".*": None
+    }
+}
+
+
 class ListLeases(command.ListCommand):
     """Print a list of leases."""
     resource = 'lease'
@@ -121,6 +145,34 @@ class CreateLease(command.CreateCommand):
         return parser
 
     def args2body(self, parsed_args):
+        def parse_params(str_params, default):
+            request_params = {}
+            prog = re.compile('^(?:(.*),)?(%s)=(.*)$'
+                              % "|".join(default.keys()))
+
+            while str_params != "":
+                match = prog.search(str_params)
+
+                if match is None:
+                    raise exception.IncorrectLease(err_msg)
+
+                self.log.info("Matches: %s", match.groups())
+                k, v = match.group(2, 3)
+                if k in request_params.keys():
+                    raise exception.DuplicatedLeaseParameters(err_msg)
+                else:
+                    if strutils.is_int_like(v):
+                        request_params[k] = int(v)
+                    else:
+                        request_params[k] = v
+
+                str_params = match.group(1) if match.group(1) else ""
+
+            request_params.update({k: v for k, v in default.items()
+                                   if k not in request_params.keys() and
+                                   v is not None})
+            return request_params
+
         params = {}
         if parsed_args.name:
             params['name'] = parsed_args.name
@@ -167,26 +219,9 @@ class CreateLease(command.CreateCommand):
                        "hypervisor_properties=str,resource_properties=str,"
                        "before_end=str>"
                        % phys_res_str)
-            phys_res_info = {"min": "", "max": "", "hypervisor_properties": "",
-                             "resource_properties": "", "before_end": None}
-            prog = re.compile('^(?:(.*),)?(%s)=(.*)$'
-                              % "|".join(phys_res_info.keys()))
+            defaults = CREATE_RESERVATION_KEYS["physical:host"]
+            phys_res_info = parse_params(phys_res_str, defaults)
 
-            def parse_params(params):
-                match = prog.search(params)
-                if match:
-                    self.log.info("Matches: %s", match.groups())
-                    k, v = match.group(2, 3)
-                    if not phys_res_info[k]:
-                        phys_res_info[k] = v
-                    else:
-                        raise exception.DuplicatedLeaseParameters(err_msg)
-                    if match.group(1) is not None:
-                        parse_params(match.group(1))
-                else:
-                    raise exception.IncorrectLease(err_msg)
-
-            parse_params(phys_res_str)
             if not (phys_res_info['min'] and phys_res_info['max']):
                 raise exception.IncorrectLease(err_msg)
 
@@ -211,8 +246,6 @@ class CreateLease(command.CreateCommand):
                            % phys_res_str)
                 raise exception.IncorrectLease(err_msg)
 
-            if phys_res_info['before_end'] is None:
-                phys_res_info.pop('before_end')
             # NOTE(sbauza): The resource type should be conf-driven mapped with
             #               blazar.conf file but that's potentially on another
             #               host
@@ -227,16 +260,17 @@ class CreateLease(command.CreateCommand):
                        "Reservation arguments must be of the "
                        "form --reservation <key=value>"
                        % res_str)
-            res_info = {}
-            for kv_str in res_str.split(","):
-                try:
-                    k, v = kv_str.split("=", 1)
-                except ValueError:
-                    raise exception.IncorrectLease(err_msg)
-                if strutils.is_int_like(v):
-                    v = int(v)
-                res_info[k] = v
+
+            if "physical:host" in res_str:
+                defaults = CREATE_RESERVATION_KEYS['physical:host']
+            elif "virtual:instance" in res_str:
+                defaults = CREATE_RESERVATION_KEYS['virtual:instance']
+            else:
+                defaults = CREATE_RESERVATION_KEYS['others']
+
+            res_info = parse_params(res_str, defaults)
             reservations.append(res_info)
+
         if reservations:
             params['reservations'] += reservations
 
