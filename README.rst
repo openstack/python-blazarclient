@@ -26,3 +26,4 @@ Other Resources
 
 * Blueprints/Bugs: https://launchpad.net/blazar
 * Documentation: https://docs.openstack.org/blazar/latest/
+* Release notes: https://docs.openstack.org/releasenotes/python-blazarclient/
