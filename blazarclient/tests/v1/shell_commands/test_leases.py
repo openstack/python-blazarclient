@@ -55,8 +55,8 @@ class CreateLeaseTestCase(tests.TestCase):
             'name': 'lease-test',
             'reservations': [
                 {
-                    'min': '1',
-                    'max': '2',
+                    'min': 1,
+                    'max': 2,
                     'hypervisor_properties':
                         '["and", [">=", "$vcpus", "2"], '
                         '[">=", "$memory_mb", "2048"]]',
@@ -114,6 +114,66 @@ class CreateLeaseTestCase(tests.TestCase):
         self.assertRaises(exception.DuplicatedLeaseParameters,
                           self.cl.args2body,
                           args)
+
+    def test_args2body_correct_instance_res_params(self):
+        args = argparse.Namespace(
+            start='2020-07-24 20:00',
+            end='2020-08-09 22:30',
+            before_end='2020-08-09 21:30',
+            events=[],
+            name='lease-test',
+            reservations=[
+                'vcpus=4,'
+                'memory_mb=1024,'
+                'disk_gb=10,'
+                'amount=2,'
+                'affinity=True,'
+                'resource_properties='
+                '["==", "$extra_key", "extra_value"],'
+                'resource_type=virtual:instance'
+            ],
+            physical_reservations=[
+                'min=1,'
+                'max=2,'
+                'hypervisor_properties='
+                '["and", [">=", "$vcpus", "2"], '
+                '[">=", "$memory_mb", "2048"]],'
+                'resource_properties='
+                '["==", "$extra_key", "extra_value"],'
+                'before_end=default'
+            ]
+        )
+        expected = {
+            'start': '2020-07-24 20:00',
+            'end': '2020-08-09 22:30',
+            'before_end': '2020-08-09 21:30',
+            'events': [],
+            'name': 'lease-test',
+            'reservations': [
+                {
+                    'min': 1,
+                    'max': 2,
+                    'hypervisor_properties':
+                        '["and", [">=", "$vcpus", "2"], '
+                        '[">=", "$memory_mb", "2048"]]',
+                    'resource_properties':
+                        '["==", "$extra_key", "extra_value"]',
+                    'resource_type': 'physical:host',
+                    'before_end': 'default'
+                },
+                {
+                    'vcpus': 4,
+                    'memory_mb': 1024,
+                    'disk_gb': 10,
+                    'amount': 2,
+                    'affinity': 'True',
+                    'resource_properties':
+                        '["==", "$extra_key", "extra_value"]',
+                    'resource_type': 'virtual:instance'
+                }
+            ]
+        }
+        self.assertDictEqual(self.cl.args2body(args), expected)
 
 
 class UpdateLeaseTestCase(tests.TestCase):
