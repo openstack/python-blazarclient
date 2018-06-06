@@ -458,7 +458,8 @@ class BlazarShell(app.App):
             self.options.os_reservation_api_version,
             session=sess,
             service_type=self.options.service_type,
-            interface=self.options.endpoint_type
+            interface=self.options.endpoint_type,
+            region_name=self.options.os_region_name,
         )
         return
 
