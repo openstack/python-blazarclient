@@ -1,0 +1,12 @@
+---
+fixes:
+  - |
+    When the blazar CLI client got an error code from the blazar server,
+    it didn't display error messages created in the blazar server.
+    Instead, it displayed `messages created in keystoneauth`_ with poor
+    information. See the `bug report`_ for example.
+    It was fixed to display original error messages which include useful
+    information.
+
+    .. _messages created in keystoneauth: https://github.com/openstack/keystoneauth/blob/master/keystoneauth1/exceptions/http.py
+    .. _bug report: https://bugs.launchpad.net/blazar/+bug/1777548

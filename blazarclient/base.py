@@ -110,6 +110,25 @@ class RequestManager(object):
         return resp, body
 
 
+class SessionClient(adapter.LegacyJsonAdapter):
+    """Manager to create request with keystoneauth1 session."""
+
+    def request(self, url, method, **kwargs):
+        resp, body = super(SessionClient, self).request(
+            url, method, raise_exc=False, **kwargs)
+
+        if resp.status_code >= 400:
+            if body is not None:
+                error_message = body.get('error_message', body)
+            else:
+                error_message = resp.text
+
+            msg = _("ERROR: {0}").format(error_message)
+            raise exception.BlazarClientException(msg, code=resp.status_code)
+
+        return resp, body
+
+
 class BaseClientManager(object):
     """Base class for managing resources of Blazar."""
 
@@ -121,7 +140,7 @@ class BaseClientManager(object):
         self.session = session
 
         if self.session:
-            self.request_manager = adapter.LegacyJsonAdapter(
+            self.request_manager = SessionClient(
                 session=self.session,
                 user_agent=self.user_agent,
                 **kwargs
