@@ -1,0 +1,6 @@
+---
+fixes:
+  - |
+    The region name value provided via an environment variable or a command
+    line argument is now respected by the client. Without this fix, the wrong
+    reservation endpoint could be selected in a multi-region cloud.
