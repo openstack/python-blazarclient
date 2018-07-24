@@ -1,0 +1,17 @@
+---
+upgrade:
+  - |
+    When creating a lease using the CLI client, the default value for start
+    date was changed to use the string 'now', which is resolved to the current
+    time on the server rather than on the client. Note that if the request is
+    sent at the end of a minute and interpreted by the service at the beginning of
+    the next minute, this can result in leases that are one minute shorter than
+    what the user might expect, as the end date is still specified by the
+    client. Users who care about the exact timing of their leases should
+    explicitly specify both start and end dates.
+fixes:
+  - |
+    Creating a lease using the CLI client without specifying a start date no
+    longer fails if the request is sent to the Blazar service just before the
+    end of a minute. For more details, see `bug 1783296
+    <https://launchpad.net/bugs/1783296>`_.

@@ -76,8 +76,8 @@ class CreateLease(command.CreateCommand):
     resource = 'lease'
     json_indent = 4
     log = logging.getLogger(__name__ + '.CreateLease')
-    default_start = datetime.datetime.utcnow()
-    default_end = default_start + datetime.timedelta(days=1)
+    default_start = 'now'
+    default_end = datetime.datetime.utcnow() + datetime.timedelta(days=1)
 
     def get_parser(self, prog_name):
         parser = super(CreateLease, self).get_parser(prog_name)
@@ -89,14 +89,14 @@ class CreateLease(command.CreateCommand):
             '--start-date',
             dest='start',
             help='Time (YYYY-MM-DD HH:MM) UTC TZ for starting the lease '
-                 '(default: now)',
+                 '(default: current time on the server)',
             default=self.default_start
         )
         parser.add_argument(
             '--end-date',
             dest='end',
             help='Time (YYYY-MM-DD HH:MM) UTC TZ for ending the lease '
-                 '(default: 24h later)',
+                 '(default: 24h from now)',
             default=self.default_end
         )
         parser.add_argument(
