@@ -177,18 +177,25 @@ class CreateLease(command.CreateCommand):
         if parsed_args.name:
             params['name'] = parsed_args.name
         if not isinstance(parsed_args.start, datetime.datetime):
-            try:
-                parsed_args.start = datetime.datetime.strptime(
-                    parsed_args.start, '%Y-%m-%d %H:%M')
-            except ValueError:
-                raise exception.IncorrectLease
+            if parsed_args.start != 'now':
+                try:
+                    parsed_args.start = datetime.datetime.strptime(
+                        parsed_args.start, '%Y-%m-%d %H:%M')
+                except ValueError:
+                    raise exception.IncorrectLease
         if not isinstance(parsed_args.end, datetime.datetime):
             try:
                 parsed_args.end = datetime.datetime.strptime(
                     parsed_args.end, '%Y-%m-%d %H:%M')
             except ValueError:
                 raise exception.IncorrectLease
-        if parsed_args.start > parsed_args.end:
+
+        if parsed_args.start == 'now':
+            start = datetime.datetime.utcnow()
+        else:
+            start = parsed_args.start
+
+        if start > parsed_args.end:
             raise exception.IncorrectLease
 
         if parsed_args.before_end:
@@ -197,14 +204,17 @@ class CreateLease(command.CreateCommand):
                     parsed_args.before_end, '%Y-%m-%d %H:%M')
             except ValueError:
                 raise exception.IncorrectLease
-            if (parsed_args.before_end < parsed_args.start
+            if (parsed_args.before_end < start
                     or parsed_args.end < parsed_args.before_end):
                 raise exception.IncorrectLease
             params['before_end'] = datetime.datetime.strftime(
                 parsed_args.before_end, '%Y-%m-%d %H:%M')
 
-        params['start'] = datetime.datetime.strftime(parsed_args.start,
-                                                     '%Y-%m-%d %H:%M')
+        if parsed_args.start == 'now':
+            params['start'] = parsed_args.start
+        else:
+            params['start'] = datetime.datetime.strftime(parsed_args.start,
+                                                         '%Y-%m-%d %H:%M')
         params['end'] = datetime.datetime.strftime(parsed_args.end,
                                                    '%Y-%m-%d %H:%M')
 

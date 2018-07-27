@@ -175,6 +175,47 @@ class CreateLeaseTestCase(tests.TestCase):
         }
         self.assertDictEqual(self.cl.args2body(args), expected)
 
+    def test_args2body_start_now(self):
+        args = argparse.Namespace(
+            start='now',
+            end='2020-08-09 22:30',
+            before_end='2020-08-09 21:30',
+            events=[],
+            name='lease-test',
+            reservations=[],
+            physical_reservations=[
+                'min=1,'
+                'max=2,'
+                'hypervisor_properties='
+                '["and", [">=", "$vcpus", "2"], '
+                '[">=", "$memory_mb", "2048"]],'
+                'resource_properties='
+                '["==", "$extra_key", "extra_value"],'
+                'before_end=default'
+            ]
+        )
+        expected = {
+            'start': 'now',
+            'end': '2020-08-09 22:30',
+            'before_end': '2020-08-09 21:30',
+            'events': [],
+            'name': 'lease-test',
+            'reservations': [
+                {
+                    'min': 1,
+                    'max': 2,
+                    'hypervisor_properties':
+                        '["and", [">=", "$vcpus", "2"], '
+                        '[">=", "$memory_mb", "2048"]]',
+                    'resource_properties':
+                        '["==", "$extra_key", "extra_value"]',
+                    'resource_type': 'physical:host',
+                    'before_end': 'default'
+                }
+            ]
+        }
+        self.assertDictEqual(self.cl.args2body(args), expected)
+
 
 class UpdateLeaseTestCase(tests.TestCase):
 
