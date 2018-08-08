@@ -102,9 +102,9 @@ def get_item_properties(item, fields, mixed_case_fields=None, formatters=None):
     return tuple(row)
 
 
-def find_resource_id_by_name_or_id(client, resource, name_or_id,
+def find_resource_id_by_name_or_id(client, resource_type, name_or_id,
                                    name_key, id_pattern):
-    resource_manager = getattr(client, resource)
+    resource_manager = getattr(client, resource_type)
     is_id = re.match(id_pattern, name_or_id)
     if is_id:
         resources = resource_manager.list()
@@ -113,11 +113,12 @@ def find_resource_id_by_name_or_id(client, resource, name_or_id,
                 return name_or_id
         raise exception.BlazarClientException('No resource found with ID %s' %
                                               name_or_id)
-    return _find_resource_id_by_name(client, resource, name_or_id, name_key)
+    return _find_resource_id_by_name(client, resource_type, name_or_id,
+                                     name_key)
 
 
-def _find_resource_id_by_name(client, resource, name, name_key):
-    resource_manager = getattr(client, resource)
+def _find_resource_id_by_name(client, resource_type, name, name_key):
+    resource_manager = getattr(client, resource_type)
     resources = resource_manager.list()
 
     named_resources = []
@@ -130,7 +131,7 @@ def _find_resource_id_by_name(client, resource, name, name_key):
         raise exception.NoUniqueMatch(message="There are more than one "
                                               "appropriate resources for the "
                                               "name '%s' and type '%s'" %
-                                              (name, resource))
+                                              (name, resource_type))
     elif named_resources:
         return named_resources[0]
     else:
