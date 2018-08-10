@@ -1,0 +1,8 @@
+---
+fixes:
+  - |
+    Creating leases using version 2.0.0 of the CLI client without specifying a
+    start date was failing with the error ``The lease parameters are
+    incorrect``, following changes related to `bug 1783296
+    <https://launchpad.net/bugs/1783296>`_. For more details, see `bug 1784038
+    <https://launchpad.net/bugs/1784038>`_.

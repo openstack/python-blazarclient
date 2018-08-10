@@ -1,0 +1,7 @@
+---
+fixes:
+  - |
+    When there are multiple leases with the same name, lease actions
+    identifying the lease by name would display an error message including a
+    dictionary of lease values, instead of ``type 'lease'``. For more details,
+    see `bug 1786030 <https://launchpad.net/bugs/1786030>`_.
