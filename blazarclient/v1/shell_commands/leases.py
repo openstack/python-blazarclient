@@ -29,6 +29,13 @@ from blazarclient import exception
 # make them parsable. Note that setting the default value to None ensures that
 # the parameter is not included in the POST request if absent.
 CREATE_RESERVATION_KEYS = {
+    "network": {
+        "network_name": "",
+        "network_description": "",
+        "network_properties": "",
+        "resource_properties": "",
+        "resource_type": 'network'
+    },
     "physical:host": {
         "min": "",
         "max": "",
@@ -78,6 +85,7 @@ class ShowLease(command.ShowCommand):
     """Show details about the given lease."""
     resource = 'lease'
     json_indent = 4
+    name_key = 'name'
     log = logging.getLogger(__name__ + '.ShowLease')
 
 
@@ -289,6 +297,8 @@ class CreateLease(command.CreateCommand):
                 defaults = CREATE_RESERVATION_KEYS['virtual:instance']
             elif "virtual:floatingip" in res_str:
                 defaults = CREATE_RESERVATION_KEYS['virtual:floatingip']
+            elif "network" in res_str:
+                defaults = CREATE_RESERVATION_KEYS['network']
             else:
                 defaults = CREATE_RESERVATION_KEYS['others']
 
@@ -337,6 +347,7 @@ class UpdateLease(command.UpdateCommand):
     """Update a lease."""
     resource = 'lease'
     json_indent = 4
+    name_key = 'name'
     log = logging.getLogger(__name__ + '.UpdateLease')
 
     def get_parser(self, prog_name):
@@ -460,4 +471,5 @@ class UpdateLease(command.UpdateCommand):
 class DeleteLease(command.DeleteCommand):
     """Delete a lease."""
     resource = 'lease'
+    name_key = 'name'
     log = logging.getLogger(__name__ + '.DeleteLease')

@@ -18,6 +18,7 @@ import logging
 from blazarclient.v1 import floatingips
 from blazarclient.v1 import hosts
 from blazarclient.v1 import leases
+from blazarclient.v1 import networks
 
 
 class Client(object):
@@ -62,3 +63,9 @@ class Client(object):
             session=self.session,
             version=self.version,
             **kwargs)
+        self.network = networks.NetworkClientManager(
+                blazar_url=self.blazar_url,
+                auth_token=self.auth_token,
+                session=self.session,
+                version=self.version,
+                **kwargs)

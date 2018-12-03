@@ -90,3 +90,9 @@ class InsufficientAuthInformation(BlazarClientException):
                 "for the authentication. The instance of "
                 "keystoneauth1.session.Session class is required.")
     code = 400
+
+
+class IncorrectNetwork(BlazarClientException):
+    """Occurs if network parameters are incorrect."""
+    message = _("The network parameters are incorrect.")
+    code = 409
