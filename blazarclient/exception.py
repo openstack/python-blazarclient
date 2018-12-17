@@ -84,7 +84,7 @@ class DuplicatedLeaseParameters(BlazarClientException):
     code = 400
 
 
-class InsufficientAuthInfomation(BlazarClientException):
+class InsufficientAuthInformation(BlazarClientException):
     """Occurs if the auth info passed to blazar client is insufficient."""
     message = _("The passed arguments are insufficient "
                 "for the authentication. The instance of "

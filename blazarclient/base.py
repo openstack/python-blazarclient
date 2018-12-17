@@ -150,4 +150,4 @@ class BaseClientManager(object):
                                                   auth_token=self.auth_token,
                                                   user_agent=self.user_agent)
         else:
-            raise exception.InsufficientAuthInfomation
+            raise exception.InsufficientAuthInformation

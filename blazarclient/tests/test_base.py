@@ -183,7 +183,7 @@ class BaseClientManagerTestCase(tests.TestCase):
                               base.RequestManager)
 
     def test_init_with_insufficient_info(self):
-        self.assertRaises(exception.InsufficientAuthInfomation,
+        self.assertRaises(exception.InsufficientAuthInformation,
                           base.BaseClientManager,
                           blazar_url=None,
                           auth_token=self.auth_token,
