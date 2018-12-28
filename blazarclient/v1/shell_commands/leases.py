@@ -204,8 +204,8 @@ class CreateLease(command.CreateCommand):
                     parsed_args.before_end, '%Y-%m-%d %H:%M')
             except ValueError:
                 raise exception.IncorrectLease
-            if (parsed_args.before_end < start
-                    or parsed_args.end < parsed_args.before_end):
+            if (parsed_args.before_end < start or
+                    parsed_args.end < parsed_args.before_end):
                 raise exception.IncorrectLease
             params['before_end'] = datetime.datetime.strftime(
                 parsed_args.before_end, '%Y-%m-%d %H:%M')
