@@ -42,6 +42,7 @@ CREATE_RESERVATION_KEYS = {
         "hypervisor_properties": "",
         "resource_properties": "",
         "before_end": None,
+        "on_start": None,
         "resource_type": 'physical:host'
     },
     "virtual:floatingip": {
@@ -127,7 +128,7 @@ class CreateLease(command.CreateCommand):
         parser.add_argument(
             '--physical-reservation',
             metavar="<min=int,max=int,hypervisor_properties=str,"
-                    "resource_properties=str,before_end=str>",
+                    "resource_properties=str,before_end=str,on_start=str>",
             action='append',
             dest='physical_reservations',
             help='Create a reservation for physical compute hosts. '
@@ -137,7 +138,8 @@ class CreateLease(command.CreateCommand):
                  'max: maximum number of hosts to reserve. '
                  'hypervisor_properties: JSON string, see doc. '
                  'resource_properties: JSON string, see doc. '
-                 'before_end: JSON string, see doc. ',
+                 'before_end: JSON string, see doc. '
+                 'on_start: JSON string, see doc. ',
             default=[]
         )
         parser.add_argument(
