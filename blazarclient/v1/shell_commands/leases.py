@@ -42,6 +42,7 @@ CREATE_RESERVATION_KEYS = {
         "hypervisor_properties": "",
         "resource_properties": "",
         "before_end": None,
+        "on_start": None,
         "resource_type": 'physical:host'
     },
     "virtual:floatingip": {
