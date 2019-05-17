@@ -246,7 +246,7 @@ class ListCommand(BlazarCommand, lister.Lister):
         return parser
 
     def retrieve_list(self, parsed_args):
-        """Retrieve a list of resources from Blazar server"""
+        """Retrieve a list of resources from Blazar server."""
         blazar_client = self.get_client()
         body = self.args2body(parsed_args)
         resource_manager = getattr(blazar_client, self.resource)
@@ -271,6 +271,18 @@ class ListCommand(BlazarCommand, lister.Lister):
         self.log.debug('get_data(%s)' % parsed_args)
         data = self.retrieve_list(parsed_args)
         return self.setup_columns(data, parsed_args)
+
+
+class ListAllocationCommand(ListCommand, lister.Lister):
+    """List allocations that belong to a given tenant."""
+
+    def retrieve_list(self, parsed_args):
+        """Retrieve a list of resources from Blazar server."""
+        blazar_client = self.get_client()
+        body = self.args2body(parsed_args)
+        resource_manager = getattr(blazar_client, self.resource)
+        data = resource_manager.list_allocations(**body)
+        return data
 
 
 class ShowCommand(BlazarCommand, show.ShowOne):
@@ -305,5 +317,17 @@ class ShowCommand(BlazarCommand, show.ShowOne):
 
         resource_manager = getattr(blazar_client, self.resource)
         data = resource_manager.get(res_id)
+        self.format_output_data(data)
+        return list(zip(*sorted(data.items())))
+
+
+class ShowAllocationCommand(ShowCommand, show.ShowOne):
+    """Show allocations for a given resource."""
+
+    def get_data(self, parsed_args):
+        self.log.debug('get_data(%s)' % parsed_args)
+        blazar_client = self.get_client()
+        resource_manager = getattr(blazar_client, self.resource)
+        data = resource_manager.get_allocation(parsed_args.id)
         self.format_output_data(data)
         return list(zip(*sorted(data.items())))

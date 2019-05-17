@@ -120,3 +120,29 @@ class DeleteHost(command.DeleteCommand):
     log = logging.getLogger(__name__ + '.DeleteHost')
     name_key = 'hypervisor_hostname'
     id_pattern = HOST_ID_PATTERN
+
+
+class ShowHostAllocation(command.ShowAllocationCommand):
+    """Show host allocation details."""
+
+    resource = 'host'
+    json_indent = 4
+    id_pattern = HOST_ID_PATTERN
+    log = logging.getLogger(__name__ + '.ShowHostAllocation')
+
+
+class ListHostAllocations(command.ListAllocationCommand):
+    """List host allocations."""
+
+    resource = 'host'
+    log = logging.getLogger(__name__ + '.ListHostAllocations')
+    list_columns = ['resource_id', 'reservations']
+
+    def get_parser(self, prog_name):
+        parser = super(ListHostAllocations, self).get_parser(prog_name)
+        parser.add_argument(
+            '--sort-by', metavar="<host_column>",
+            help='column name used to sort result',
+            default='resource_id'
+        )
+        return parser
