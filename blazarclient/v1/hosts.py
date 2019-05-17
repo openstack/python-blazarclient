@@ -28,7 +28,7 @@ class ComputeHostClientManager(base.BaseClientManager):
         return body['host']
 
     def get(self, host_id):
-        """Describes host specifications such as name and details."""
+        """Describe host specifications such as name and details."""
         resp, body = self.request_manager.get('/os-hosts/%s' % host_id)
         return body['host']
 
@@ -42,7 +42,7 @@ class ComputeHostClientManager(base.BaseClientManager):
         return body['host']
 
     def delete(self, host_id):
-        """Deletes host with specified ID."""
+        """Delete host with specified ID."""
         resp, body = self.request_manager.delete('/os-hosts/%s' % host_id)
 
     def list(self, sort_by=None):
@@ -52,3 +52,17 @@ class ComputeHostClientManager(base.BaseClientManager):
         if sort_by:
             hosts = sorted(hosts, key=lambda l: l[sort_by])
         return hosts
+
+    def get_allocation(self, host_id):
+        """Get allocation for host."""
+        resp, body = self.request_manager.get(
+            '/os-hosts/%s/allocation' % host_id)
+        return body['allocation']
+
+    def list_allocations(self, sort_by=None):
+        """List allocations for all hosts."""
+        resp, body = self.request_manager.get('/os-hosts/allocations')
+        allocations = body['allocations']
+        if sort_by:
+            allocations = sorted(allocations, key=lambda l: l[sort_by])
+        return allocations
