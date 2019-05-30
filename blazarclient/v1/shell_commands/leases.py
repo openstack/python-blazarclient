@@ -33,6 +33,11 @@ CREATE_RESERVATION_KEYS = {
         "before_end": None,
         "resource_type": 'physical:host'
     },
+    "virtual:floatingip": {
+        "amount": 1,
+        "required_floatingips": [],
+        "resource_type": 'virtual:floatingip'
+    },
     "virtual:instance": {
         "vcpus": "",
         "memory_mb": "",
@@ -275,6 +280,8 @@ class CreateLease(command.CreateCommand):
                 defaults = CREATE_RESERVATION_KEYS['physical:host']
             elif "virtual:instance" in res_str:
                 defaults = CREATE_RESERVATION_KEYS['virtual:instance']
+            elif "virtual:floatingip" in res_str:
+                defaults = CREATE_RESERVATION_KEYS['virtual:floatingip']
             else:
                 defaults = CREATE_RESERVATION_KEYS['others']
 
