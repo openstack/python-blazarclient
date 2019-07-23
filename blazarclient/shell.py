@@ -33,6 +33,7 @@ import six
 from blazarclient import client as blazar_client
 from blazarclient import exception
 from blazarclient import utils
+from blazarclient.v1.shell_commands import floatingips
 from blazarclient.v1.shell_commands import hosts
 from blazarclient.v1.shell_commands import leases
 from blazarclient import version as base_version
@@ -47,7 +48,11 @@ COMMANDS_V1 = {
     'host-show': hosts.ShowHost,
     'host-create': hosts.CreateHost,
     'host-update': hosts.UpdateHost,
-    'host-delete': hosts.DeleteHost
+    'host-delete': hosts.DeleteHost,
+    'floatingip-list': floatingips.ListFloatingIPs,
+    'floatingip-show': floatingips.ShowFloatingIP,
+    'floatingip-create': floatingips.CreateFloatingIP,
+    'floatingip-delete': floatingips.DeleteFloatingIP,
 }
 
 VERSION = 1
