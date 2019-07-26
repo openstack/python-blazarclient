@@ -28,6 +28,7 @@ from oslo_utils import encodeutils
 
 from blazarclient import client as blazar_client
 from blazarclient import exception
+from blazarclient.v1.shell_commands import allocations
 from blazarclient.v1.shell_commands import floatingips
 from blazarclient.v1.shell_commands import hosts
 from blazarclient.v1.shell_commands import leases
@@ -51,6 +52,8 @@ COMMANDS_V1 = {
     'floatingip-show': floatingips.ShowFloatingIP,
     'floatingip-create': floatingips.CreateFloatingIP,
     'floatingip-delete': floatingips.DeleteFloatingIP,
+    'allocation-list': allocations.ListAllocations,
+    'allocation-show': allocations.ShowAllocations,
 }
 
 VERSION = 1

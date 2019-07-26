@@ -1,0 +1,16 @@
+---
+features:
+  - |
+    Adds support for querying the Resource Allocation API with the following
+    commands:
+
+    * ``blazar allocation-list``
+    * ``blazar allocation-show``
+
+    Only the ``host`` resource type is currently supported by the Blazar
+    service.
+
+    OpenStackClient commands are also available:
+
+    * ``openstack reservation allocation list``
+    * ``openstack reservation allocation show``

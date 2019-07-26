@@ -246,7 +246,7 @@ class ListCommand(BlazarCommand, lister.Lister):
         return parser
 
     def retrieve_list(self, parsed_args):
-        """Retrieve a list of resources from Blazar server"""
+        """Retrieve a list of resources from Blazar server."""
         blazar_client = self.get_client()
         body = self.args2body(parsed_args)
         resource_manager = getattr(blazar_client, self.resource)

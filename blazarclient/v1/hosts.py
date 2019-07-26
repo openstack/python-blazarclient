@@ -29,7 +29,7 @@ class ComputeHostClientManager(base.BaseClientManager):
         return body['host']
 
     def get(self, host_id):
-        """Describes host specifications such as name and details."""
+        """Describe host specifications such as name and details."""
         resp, body = self.request_manager.get('/os-hosts/%s' % host_id)
         return body['host']
 
@@ -43,7 +43,7 @@ class ComputeHostClientManager(base.BaseClientManager):
         return body['host']
 
     def delete(self, host_id):
-        """Deletes host with specified ID."""
+        """Delete host with specified ID."""
         resp, body = self.request_manager.delete('/os-hosts/%s' % host_id)
 
     def list(self, sort_by=None):
