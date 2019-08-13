@@ -35,6 +35,7 @@ CREATE_RESERVATION_KEYS = {
     },
     "virtual:floatingip": {
         "amount": 1,
+        "network_id": None,
         "required_floatingips": [],
         "resource_type": 'virtual:floatingip'
     },
