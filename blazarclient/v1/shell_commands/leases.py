@@ -24,6 +24,9 @@ from blazarclient import command
 from blazarclient import exception
 
 
+# All valid reservation parameters must be added to CREATE_RESERVATION_KEYS to
+# make them parsable. Note that setting the default value to None ensures that
+# the parameter is not included in the POST request if absent.
 CREATE_RESERVATION_KEYS = {
     "physical:host": {
         "min": "",
