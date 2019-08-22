@@ -1,0 +1,13 @@
+---
+features:
+  - |
+    Added support for operators to manage reservable floating IPs using the
+    following new commands:
+
+    * ``floatingip-create``
+    * ``floatingip-delete``
+    * ``floatingip-list``
+    * ``floatingip-show``
+  - |
+    Added support for users to create floating IP reservations using the
+    ``virtual:floatingip`` resource type.
