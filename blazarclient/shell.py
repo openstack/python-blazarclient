@@ -47,6 +47,7 @@ COMMANDS_V1 = {
     'host-delete': hosts.DeleteHost,
     'host-allocation-show': hosts.ShowHostAllocation,
     'host-allocation-list': hosts.ListHostAllocations,
+    'host-reallocate': hosts.ReallocateHost,
     'network-list': networks.ListNetworks,
     'network-show': networks.ShowNetwork,
     'network-create': networks.CreateNetwork,

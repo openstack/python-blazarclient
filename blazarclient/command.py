@@ -331,3 +331,42 @@ class ShowAllocationCommand(ShowCommand, show.ShowOne):
         data = resource_manager.get_allocation(parsed_args.id)
         self.format_output_data(data)
         return list(zip(*sorted(data.items())))
+
+
+class ReallocateCommand(BlazarCommand):
+    """Reallocate host from current leases."""
+
+    api = 'reservation'
+    resource = None
+    log = None
+
+    def get_parser(self, prog_name):
+        parser = super(ReallocateCommand, self).get_parser(prog_name)
+        if self.allow_names:
+            help_str = 'ID or name of %s to update'
+        else:
+            help_str = 'ID of %s to update'
+        parser.add_argument(
+            'id', metavar=self.resource.upper(),
+            help=help_str % self.resource
+        )
+        self.add_known_arguments(parser)
+        return parser
+
+    def run(self, parsed_args):
+        self.log.debug('run(%s)' % parsed_args)
+        blazar_client = self.get_client()
+        body = self.args2body(parsed_args)
+        if self.allow_names:
+            res_id = utils.find_resource_id_by_name_or_id(blazar_client,
+                                                          self.resource,
+                                                          parsed_args.id,
+                                                          self.name_key,
+                                                          self.id_pattern)
+        else:
+            res_id = parsed_args.id
+        resource_manager = getattr(blazar_client, self.resource)
+        resource_manager.reallocate(res_id, body)
+        print('Reallocated %s: %s' % (self.resource, parsed_args.id),
+              file=self.app.stdout)
+        return
