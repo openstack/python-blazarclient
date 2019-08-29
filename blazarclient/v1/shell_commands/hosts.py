@@ -124,7 +124,6 @@ class DeleteHost(command.DeleteCommand):
 
 class ShowHostAllocation(command.ShowAllocationCommand):
     """Show host allocation details."""
-
     resource = 'host'
     json_indent = 4
     id_pattern = HOST_ID_PATTERN
@@ -133,7 +132,6 @@ class ShowHostAllocation(command.ShowAllocationCommand):
 
 class ListHostAllocations(command.ListAllocationCommand):
     """List host allocations."""
-
     resource = 'host'
     log = logging.getLogger(__name__ + '.ListHostAllocations')
     list_columns = ['resource_id', 'reservations']
@@ -146,3 +144,32 @@ class ListHostAllocations(command.ListAllocationCommand):
             default='resource_id'
         )
         return parser
+
+
+class ReallocateHost(command.ReallocateCommand):
+    """Reallocate host from current allocations."""
+    resource = 'host'
+    json_indent = 4
+    log = logging.getLogger(__name__ + '.ReallocateHost')
+    name_key = 'hypervisor_hostname'
+    id_pattern = HOST_ID_PATTERN
+
+    def get_parser(self, prog_name):
+        parser = super(ReallocateHost, self).get_parser(prog_name)
+        parser.add_argument(
+            '--lease-id',
+            help='Lease ID to reallocate host from.')
+        parser.add_argument(
+            '--reservation-id',
+            help='Reservation ID to reallocate host from')
+        return parser
+
+    def args2body(self, parsed_args):
+        params = {}
+
+        if parsed_args.reservation_id:
+            params['reservation_id'] = parsed_args.reservation_id
+        elif parsed_args.lease_id:
+            params['lease_id'] = parsed_args.lease_id
+
+        return params
