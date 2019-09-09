@@ -1,0 +1,10 @@
+---
+fixes:
+  - |
+    Parse the ``required_floatingips`` command-line parameter as a list instead
+    of a string, to pass it to the API in the expected format. For example,
+    this parameter can be used in the following fashion:
+
+    ``blazar lease-create --reservation 'resource_type=virtual:floatingip,network_id=81fabec7-00ae-497a-b485-72f4bf187d3e,amount=2,required_floatingips=["172.24.4.2","172.24.4.3"]' fip-lease``
+
+    For more details, see `bug 1843258 <https://launchpad.net/bugs/1843258>`_.

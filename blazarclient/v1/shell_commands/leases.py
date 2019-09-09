@@ -18,6 +18,7 @@ import datetime
 import logging
 import re
 
+from oslo_serialization import jsonutils
 from oslo_utils import strutils
 
 from blazarclient import command
@@ -172,6 +173,8 @@ class CreateLease(command.CreateCommand):
                 else:
                     if strutils.is_int_like(v):
                         request_params[k] = int(v)
+                    elif isinstance(defaults[k], list):
+                        request_params[k] = jsonutils.loads(v)
                     else:
                         request_params[k] = v
 
