@@ -412,14 +412,17 @@ class UpdateLease(command.UpdateCommand):
         if parsed_args.start_date:
             params['start_date'] = parsed_args.start_date
         if parsed_args.reservation:
-            keys = [
+            keys = set([
                 # General keys
                 'id',
                 # Keys for host reservation
                 'min', 'max', 'hypervisor_properties', 'resource_properties',
                 # Keys for instance reservation
-                'vcpus', 'memory_mb', 'disk_gb', 'amount', 'affinity'
-            ]
+                'vcpus', 'memory_mb', 'disk_gb', 'amount', 'affinity',
+                # Keys for floating IP reservation
+                'amount', 'network_id', 'required_floatingips',
+            ])
+            list_keys = ['required_floatingips']
             params['reservations'] = []
             reservations = []
             for res_str in parsed_args.reservation:
@@ -433,7 +436,9 @@ class UpdateLease(command.UpdateCommand):
                     match = prog.search(params)
                     if match:
                         k, v = match.group(2, 3)
-                        if strutils.is_int_like(v):
+                        if k in list_keys:
+                            v = jsonutils.loads(v)
+                        elif strutils.is_int_like(v):
                             v = int(v)
                         res_info[k] = v
                         if match.group(1) is not None:

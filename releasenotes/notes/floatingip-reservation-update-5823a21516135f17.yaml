@@ -1,0 +1,7 @@
+---
+fixes:
+  - |
+    The command-line client now parses floating IP reservation values when
+    using the ``lease-update`` command. Note that while accepted by the client,
+    the Blazar service may prevent the update of some floating IP reservation
+    values.
