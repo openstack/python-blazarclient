@@ -104,15 +104,9 @@ def get_item_properties(item, fields, mixed_case_fields=None, formatters=None):
 
 def find_resource_id_by_name_or_id(client, resource_type, name_or_id,
                                    name_key, id_pattern):
-    resource_manager = getattr(client, resource_type)
-    is_id = re.match(id_pattern, name_or_id)
-    if is_id or name_key is None:
-        resources = resource_manager.list()
-        for resource in resources:
-            if resource['id'] == name_or_id:
-                return name_or_id
-        raise exception.BlazarClientException('No resource found with ID %s' %
-                                              name_or_id)
+    if re.match(id_pattern, name_or_id):
+        return name_or_id
+
     return _find_resource_id_by_name(client, resource_type, name_or_id,
                                      name_key)
 

@@ -25,6 +25,10 @@ from blazarclient.v1.shell_commands import leases
 
 mock_time = mock.Mock(return_value=datetime(2020, 6, 8))
 
+FIRST_LEASE = 'd1e43d6d-8f6f-4c2e-b0a9-2982b39dc698'
+SECOND_LEASE = '424d21c3-45a2-448a-81ad-32eddc888375'
+
+
 @mock.patch('blazarclient.v1.shell_commands.leases._utc_now', mock_time)
 class CreateLeaseTestCase(tests.TestCase):
 
@@ -308,3 +312,81 @@ class UpdateLeaseTestCase(tests.TestCase):
         }
 
         self.assertDictEqual(self.cl.args2body(args), expected)
+
+
+class ShowLeaseTestCase(tests.TestCase):
+
+    def create_show_command(self):
+        mock_lease_manager = mock.Mock()
+        mock_client = mock.Mock()
+        mock_client.lease = mock_lease_manager
+
+        blazar_shell = shell.BlazarShell()
+        blazar_shell.client = mock_client
+        return (leases.ShowLease(blazar_shell, mock.Mock()),
+                mock_lease_manager)
+
+    def test_show_lease(self):
+        show_lease, lease_manager = self.create_show_command()
+        lease_manager.get.return_value = {'id': FIRST_LEASE}
+        mock.seal(lease_manager)
+
+        args = argparse.Namespace(id=FIRST_LEASE)
+        expected = [('id',), (FIRST_LEASE,)]
+
+        self.assertEqual(show_lease.get_data(args), expected)
+        lease_manager.get.assert_called_once_with(FIRST_LEASE)
+
+    def test_show_lease_by_name(self):
+        show_lease, lease_manager = self.create_show_command()
+        lease_manager.list.return_value = [
+            {'id': FIRST_LEASE, 'name': 'first-lease'},
+            {'id': SECOND_LEASE, 'name': 'second-lease'},
+        ]
+        lease_manager.get.return_value = {'id': SECOND_LEASE}
+        mock.seal(lease_manager)
+
+        args = argparse.Namespace(id='second-lease')
+        expected = [('id',), (SECOND_LEASE,)]
+
+        self.assertEqual(show_lease.get_data(args), expected)
+        lease_manager.list.assert_called_once_with()
+        lease_manager.get.assert_called_once_with(SECOND_LEASE)
+
+
+class DeleteLeaseTestCase(tests.TestCase):
+
+    def create_delete_command(self):
+        mock_lease_manager = mock.Mock()
+        mock_client = mock.Mock()
+        mock_client.lease = mock_lease_manager
+
+        blazar_shell = shell.BlazarShell()
+        blazar_shell.client = mock_client
+        return (leases.DeleteLease(blazar_shell, mock.Mock()),
+                mock_lease_manager)
+
+    def test_delete_lease(self):
+        delete_lease, lease_manager = self.create_delete_command()
+        lease_manager.delete.return_value = None
+        mock.seal(lease_manager)
+
+        args = argparse.Namespace(id=FIRST_LEASE)
+        delete_lease.run(args)
+
+        lease_manager.delete.assert_called_once_with(FIRST_LEASE)
+
+    def test_delete_lease_by_name(self):
+        delete_lease, lease_manager = self.create_delete_command()
+        lease_manager.list.return_value = [
+            {'id': FIRST_LEASE, 'name': 'first-lease'},
+            {'id': SECOND_LEASE, 'name': 'second-lease'},
+        ]
+        lease_manager.delete.return_value = None
+        mock.seal(lease_manager)
+
+        args = argparse.Namespace(id='second-lease')
+        delete_lease.run(args)
+
+        lease_manager.list.assert_called_once_with()
+        lease_manager.delete.assert_called_once_with(SECOND_LEASE)
