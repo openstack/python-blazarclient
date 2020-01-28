@@ -328,6 +328,7 @@ class ShowLeaseTestCase(tests.TestCase):
     def test_show_lease(self):
         show_lease, lease_manager = self.create_show_command()
         lease_manager.get.return_value = {'id': FIRST_LEASE}
+        mock.seal(lease_manager)
 
         args = argparse.Namespace(id=FIRST_LEASE)
         expected = [('id',), (FIRST_LEASE,)]
@@ -342,6 +343,7 @@ class ShowLeaseTestCase(tests.TestCase):
             {'id': SECOND_LEASE, 'name': 'second-lease'},
         ]
         lease_manager.get.return_value = {'id': SECOND_LEASE}
+        mock.seal(lease_manager)
 
         args = argparse.Namespace(id='second-lease')
         expected = [('id',), (SECOND_LEASE,)]
@@ -366,6 +368,7 @@ class DeleteLeaseTestCase(tests.TestCase):
     def test_delete_lease(self):
         delete_lease, lease_manager = self.create_delete_command()
         lease_manager.delete.return_value = None
+        mock.seal(lease_manager)
 
         args = argparse.Namespace(id=FIRST_LEASE)
         delete_lease.run(args)
@@ -379,6 +382,7 @@ class DeleteLeaseTestCase(tests.TestCase):
             {'id': SECOND_LEASE, 'name': 'second-lease'},
         ]
         lease_manager.delete.return_value = None
+        mock.seal(lease_manager)
 
         args = argparse.Namespace(id='second-lease')
         delete_lease.run(args)
