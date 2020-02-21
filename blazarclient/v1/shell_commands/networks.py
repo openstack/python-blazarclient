@@ -147,3 +147,28 @@ class DeleteNetwork(command.DeleteCommand):
     """Delete a network."""
     resource = 'network'
     log = logging.getLogger(__name__ + '.DeleteNetwork')
+
+
+class ShowNetworkAllocation(command.ShowAllocationCommand):
+    """Show network allocation details."""
+    resource = 'network'
+    allow_names = False
+    json_indent = 4
+    log = logging.getLogger(__name__ + '.ShowNetworkAllocation')
+
+
+class ListNetworkAllocations(command.ListAllocationCommand):
+    """List network allocations."""
+    resource = 'network'
+    allow_names = False
+    log = logging.getLogger(__name__ + '.ListNetworkAllocations')
+    list_columns = ['resource_id', 'reservations']
+
+    def get_parser(self, prog_name):
+        parser = super(ListNetworkAllocations, self).get_parser(prog_name)
+        parser.add_argument(
+            '--sort-by', metavar="<network_column>",
+            help='column name used to sort result',
+            default='resource_id'
+        )
+        return parser

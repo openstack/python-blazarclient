@@ -44,7 +44,7 @@ class NetworkClientManager(base.BaseClientManager):
         return body['network']
 
     def delete(self, network_id):
-        """Deletes network segment with specified ID."""
+        """Delete network segment with specified ID."""
         resp, body = self.request_manager.delete('/networks/%s' % network_id)
 
     def list(self, sort_by=None):
@@ -54,3 +54,17 @@ class NetworkClientManager(base.BaseClientManager):
         if sort_by:
             networks = sorted(networks, key=lambda l: l[sort_by])
         return networks
+
+    def get_allocation(self, network_id):
+        """Get allocation for network."""
+        resp, body = self.request_manager.get(
+            '/networks/%s/allocation' % network_id)
+        return body['allocation']
+
+    def list_allocations(self, sort_by=None):
+        """List allocations for all networks."""
+        resp, body = self.request_manager.get('/networks/allocations')
+        allocations = body['allocations']
+        if sort_by:
+            allocations = sorted(allocations, key=lambda l: l[sort_by])
+        return allocations
