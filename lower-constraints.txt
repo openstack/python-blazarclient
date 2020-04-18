@@ -9,7 +9,6 @@ fixtures==3.0.0
 iso8601==0.1.11
 keystoneauth1==3.4.0
 linecache2==1.0.0
-mock==3.0.0
 monotonic==0.6
 mox3==0.20.0
 msgpack-python==0.4.0

@@ -15,7 +15,7 @@
 
 import argparse
 from datetime import datetime
-import mock
+from unittest import mock
 
 from blazarclient import exception
 from blazarclient import shell

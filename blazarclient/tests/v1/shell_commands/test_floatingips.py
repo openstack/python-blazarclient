@@ -14,7 +14,7 @@
 # limitations under the License.
 
 import argparse
-import mock
+from unittest import mock
 
 from blazarclient import shell
 from blazarclient import tests
