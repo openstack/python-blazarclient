@@ -67,6 +67,14 @@ class RequestManager(object):
         """
         return self.request(url, 'PUT', body=body)
 
+    def patch(self, url, body):
+        """Sends patch request to Blazar.
+
+        :param url: URL to the wanted Blazar resource.
+        :type url: str
+        """
+        return self.request(url, 'PATCH', body=body)
+
     def request(self, url, method, **kwargs):
         """Base request method.
 

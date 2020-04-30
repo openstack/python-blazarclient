@@ -16,6 +16,7 @@
 import logging
 
 from blazarclient import command
+from blazarclient import exception
 
 HOST_ID_PATTERN = '^[0-9]+$'
 
@@ -173,3 +174,59 @@ class ReallocateHost(command.ReallocateCommand):
             params['lease_id'] = parsed_args.lease_id
 
         return params
+
+
+class ShowHostCapability(command.ShowCapabilityCommand):
+    """Show host capability."""
+    resource = 'host'
+    json_indent = 4
+    log = logging.getLogger(__name__ + '.ShowHostCapability')
+
+
+class ListHostCapabilities(command.ListCommand):
+    """List host capabilities."""
+    resource = 'host'
+    log = logging.getLogger(__name__ + '.ListHostCapabilities')
+    list_columns = ['property', 'private', 'capability_values']
+
+    def args2body(self, parsed_args):
+        params = {'detail': parsed_args.detail}
+        if parsed_args.sort_by:
+            if parsed_args.sort_by in self.list_columns:
+                params['sort_by'] = parsed_args.sort_by
+            else:
+                msg = 'Invalid sort option %s' % parsed_args.sort_by
+                raise exception.BlazarClientException(msg)
+
+        return params
+
+    def retrieve_list(self, parsed_args):
+        """Retrieve a list of resources from Blazar server."""
+        blazar_client = self.get_client()
+        body = self.args2body(parsed_args)
+        resource_manager = getattr(blazar_client, self.resource)
+        data = resource_manager.list_capabilities(**body)
+        return data
+
+    def get_parser(self, prog_name):
+        parser = super(ListHostCapabilities, self).get_parser(prog_name)
+        parser.add_argument(
+            '--detail',
+            action='store_true',
+            help='Return capabilities with values and attributes.',
+            default=False
+        )
+        parser.add_argument(
+            '--sort-by', metavar="<extra_capability_column>",
+            help='column name used to sort result',
+            default='property'
+        )
+        return parser
+
+
+class UpdateHostCapability(command.UpdateCapabilityCommand):
+    """Update attributes of a host capability."""
+    resource = 'host'
+    json_indent = 4
+    log = logging.getLogger(__name__ + '.UpdateHostCapability')
+    name_key = 'capability_name'
