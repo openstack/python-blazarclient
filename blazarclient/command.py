@@ -370,3 +370,68 @@ class ReallocateCommand(BlazarCommand):
         print('Reallocated %s: %s' % (self.resource, parsed_args.id),
               file=self.app.stdout)
         return
+
+
+class ShowCapabilityCommand(BlazarCommand, show.ShowOne):
+    """Show information of a given resource."""
+
+    api = 'reservation'
+    resource = None
+    log = None
+
+    def get_parser(self, prog_name):
+        parser = super(ShowCapabilityCommand, self).get_parser(prog_name)
+        parser.add_argument('capability_name', metavar='CAPABILITY_NAME',
+                            help='Name of extra capablity.')
+        return parser
+
+    def get_data(self, parsed_args):
+        self.log.debug('get_data(%s)' % parsed_args)
+        blazar_client = self.get_client()
+        resource_manager = getattr(blazar_client, self.resource)
+        data = resource_manager.get_capability(parsed_args.capability_name)
+        self.format_output_data(data)
+        return list(zip(*sorted(data.items())))
+
+
+class UpdateCapabilityCommand(BlazarCommand):
+    api = 'reservation'
+    resource = None
+    log = None
+
+    def run(self, parsed_args):
+        self.log.debug('run(%s)' % parsed_args)
+        blazar_client = self.get_client()
+        body = self.args2body(parsed_args)
+        resource_manager = getattr(blazar_client, self.resource)
+        resource_manager.set_capability(**body)
+        print(
+            'Updated %s extra capability: %s' % (
+                self.resource, parsed_args.capability_name),
+            file=self.app.stdout)
+        return
+
+    def get_parser(self, prog_name):
+        parser = super(UpdateCapabilityCommand, self).get_parser(prog_name)
+        parser.add_argument(
+            'capability_name', metavar='CAPABILITY_NAME',
+            help='Name of extra capability to patch.'
+        )
+        parser.add_argument(
+            '--private',
+            action='store_true',
+            default=False,
+            help='Set capability to private.'
+        )
+        parser.add_argument(
+            '--public',
+            action='store_true',
+            default=False,
+            help='Set capability to public.'
+        )
+        return parser
+
+    def args2body(self, parsed_args):
+        return dict(
+            capability_name=parsed_args.capability_name,
+            private=(parsed_args.private is True))
