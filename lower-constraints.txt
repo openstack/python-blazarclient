@@ -29,7 +29,7 @@ oslotest==3.2.0
 pbr==2.0.0
 pep8==1.5.7
 prettytable==0.7.1
-pyflakes==0.8.1
+pyflakes==2.1.1
 pyinotify==0.9.6
 pyparsing==2.1.0
 pyperclip==1.5.27
