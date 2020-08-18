@@ -182,8 +182,8 @@ class CreateLeaseTestCase(tests.TestCase):
     def test_args2body_start_now(self):
         args = argparse.Namespace(
             start='now',
-            end='2020-08-09 22:30',
-            before_end='2020-08-09 21:30',
+            end='2030-08-09 22:30',
+            before_end='2030-08-09 21:30',
             events=[],
             name='lease-test',
             reservations=[],
@@ -200,8 +200,8 @@ class CreateLeaseTestCase(tests.TestCase):
         )
         expected = {
             'start': 'now',
-            'end': '2020-08-09 22:30',
-            'before_end': '2020-08-09 21:30',
+            'end': '2030-08-09 22:30',
+            'before_end': '2030-08-09 21:30',
             'events': [],
             'name': 'lease-test',
             'reservations': [
