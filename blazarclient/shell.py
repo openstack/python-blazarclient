@@ -26,6 +26,7 @@ import sys
 from cliff import app
 from cliff import commandmanager
 from keystoneauth1 import identity
+from keystoneauth1 import loading
 from keystoneauth1 import session
 from oslo_utils import encodeutils
 import six
@@ -201,128 +202,18 @@ class BlazarShell(app.App):
         parser.add_argument(
             '--os_reservation_api_version',
             help=argparse.SUPPRESS)
-        parser.add_argument(
-            '--os-auth-strategy', metavar='<auth-strategy>',
-            default=env('OS_AUTH_STRATEGY', default='keystone'),
-            help='Authentication strategy (Env: OS_AUTH_STRATEGY'
-            ', default keystone). For now, any other value will'
-            ' disable the authentication')
-        parser.add_argument(
-            '--os_auth_strategy',
-            help=argparse.SUPPRESS)
-        parser.add_argument(
-            '--os-auth-url', metavar='<auth-url>',
-            default=env('OS_AUTH_URL'),
-            help='Authentication URL (Env: OS_AUTH_URL)')
-        parser.add_argument(
-            '--os_auth_url',
-            help=argparse.SUPPRESS)
-        parser.add_argument(
-            '--os-project-name', metavar='<auth-project-name>',
-            default=env('OS_PROJECT_NAME'),
-            help='Authentication project name (Env: OS_PROJECT_NAME)')
-        parser.add_argument(
-            '--os_project_name',
-            help=argparse.SUPPRESS)
-        parser.add_argument(
-            '--os-project-id', metavar='<auth-project-id>',
-            default=env('OS_PROJECT_ID'),
-            help='Authentication project ID (Env: OS_PROJECT_ID)')
-        parser.add_argument(
-            '--os_project_id',
-            help=argparse.SUPPRESS)
-        parser.add_argument(
-            '--os-project-domain-name', metavar='<auth-project-domain-name>',
-            default=env('OS_PROJECT_DOMAIN_NAME'),
-            help='Authentication project domain name '
-                 '(Env: OS_PROJECT_DOMAIN_NAME)')
-        parser.add_argument(
-            '--os_project_domain_name',
-            help=argparse.SUPPRESS)
-        parser.add_argument(
-            '--os-project-domain-id', metavar='<auth-project-domain-id>',
-            default=env('OS_PROJECT_DOMAIN_ID'),
-            help='Authentication project domain ID '
-                 '(Env: OS_PROJECT_DOMAIN_ID)')
-        parser.add_argument(
-            '--os_project_domain_id',
-            help=argparse.SUPPRESS)
-        parser.add_argument(
-            '--os-tenant-name', metavar='<auth-tenant-name>',
-            default=env('OS_TENANT_NAME'),
-            help='Authentication tenant name (Env: OS_TENANT_NAME)')
-        parser.add_argument(
-            '--os_tenant_name',
-            help=argparse.SUPPRESS)
-        parser.add_argument(
-            '--os-tenant-id', metavar='<auth-tenant-id>',
-            default=env('OS_TENANT_ID'),
-            help='Authentication tenant name (Env: OS_TENANT_ID)')
-        parser.add_argument(
-            '--os-username', metavar='<auth-username>',
-            default=utils.env('OS_USERNAME'),
-            help='Authentication username (Env: OS_USERNAME)')
-        parser.add_argument(
-            '--os_username',
-            help=argparse.SUPPRESS)
-        parser.add_argument(
-            '--os-user-domain-name', metavar='<auth-user-domain-name>',
-            default=env('OS_USER_DOMAIN_NAME'),
-            help='Authentication user domain name (Env: OS_USER_DOMAIN_NAME)')
-        parser.add_argument(
-            '--os_user_domain_name',
-            help=argparse.SUPPRESS)
-        parser.add_argument(
-            '--os-user-domain-id', metavar='<auth-user-domain-id>',
-            default=env('OS_USER_DOMAIN_ID'),
-            help='Authentication user domain ID (Env: OS_USER_DOMAIN_ID)')
-        parser.add_argument(
-            '--os_user_domain_id',
-            help=argparse.SUPPRESS)
-        parser.add_argument(
-            '--os-password', metavar='<auth-password>',
-            default=utils.env('OS_PASSWORD'),
-            help='Authentication password (Env: OS_PASSWORD)')
-        parser.add_argument(
-            '--os_password',
-            help=argparse.SUPPRESS)
-        parser.add_argument(
-            '--os-region-name', metavar='<auth-region-name>',
-            default=env('OS_REGION_NAME'),
-            help='Authentication region name (Env: OS_REGION_NAME)')
-        parser.add_argument(
-            '--os_region_name',
-            help=argparse.SUPPRESS)
-        parser.add_argument(
-            '--os-token', metavar='<token>',
-            default=env('OS_TOKEN'),
-            help='Defaults to env[OS_TOKEN]')
-        parser.add_argument(
-            '--os_token',
-            help=argparse.SUPPRESS)
+
+        # Deprecated arguments
         parser.add_argument(
             '--service-type', metavar='<service-type>',
-            default=env('BLAZAR_SERVICE_TYPE', default='reservation'),
-            help='Defaults to env[BLAZAR_SERVICE_TYPE] or reservation.')
+            default=env('BLAZAR_SERVICE_TYPE'),
+            help=('(deprecated) use --os-service-type instead. '
+                  'Defaults to env[BLAZAR_SERVICE_TYPE].'))
         parser.add_argument(
             '--endpoint-type', metavar='<endpoint-type>',
-            default=env('OS_ENDPOINT_TYPE', default='publicURL'),
-            help='Defaults to env[OS_ENDPOINT_TYPE] or publicURL.')
-        parser.add_argument(
-            '--os-cacert',
-            metavar='<ca-certificate>',
-            default=env('OS_CACERT', default=None),
-            help="Specify a CA bundle file to use in "
-                 "verifying a TLS (https) server certificate. "
-                 "Defaults to env[OS_CACERT]")
-        parser.add_argument(
-            '--insecure',
-            action='store_true',
-            default=env('BLAZARCLIENT_INSECURE', default=False),
-            help="Explicitly allow blazarclient to perform \"insecure\" "
-                 "SSL (https) requests. The server's certificate will "
-                 "not be verified against any certificate authorities. "
-                 "This option should be used with caution.")
+            default=env('OS_ENDPOINT_TYPE'),
+            help=('(deprecated) use --os-interface intstead. '
+                  'Defaults to env[OS_ENDPOINT_TYPE].'))
 
         return parser
 
@@ -350,6 +241,10 @@ class BlazarShell(app.App):
         :param argv: input arguments and options
         :paramtype argv: list of str
         """
+        loading.register_auth_argparse_arguments(self.parser, argv)
+        loading.session.register_argparse_arguments(self.parser)
+        loading.adapter.register_argparse_arguments(
+            self.parser, service_type='reservation')
 
         try:
             self.options, remainder = self.parser.parse_known_args(argv)
@@ -444,43 +339,14 @@ class BlazarShell(app.App):
 
     def authenticate_user(self):
         """Authenticate user and set client by using passed params."""
-
-        if self.options.os_token:
-            auth = identity.Token(
-                auth_url=self.options.os_auth_url,
-                token=self.options.os_token,
-                tenant_id=self.options.os_tenant_id,
-                tenant_name=self.options.os_tenant_name,
-                project_id=self.options.os_project_id,
-                project_name=self.options.os_project_name,
-                project_domain_id=self.options.os_project_domain_id,
-                project_domain_name=self.options.os_project_domain_name
-            )
-        else:
-            auth = identity.Password(
-                auth_url=self.options.os_auth_url,
-                username=self.options.os_username,
-                tenant_id=self.options.os_tenant_id,
-                tenant_name=self.options.os_tenant_name,
-                password=self.options.os_password,
-                project_id=self.options.os_project_id,
-                project_name=self.options.os_project_name,
-                project_domain_id=self.options.os_project_domain_id,
-                project_domain_name=self.options.os_project_domain_name,
-                user_domain_id=self.options.os_user_domain_id,
-                user_domain_name=self.options.os_user_domain_name
-            )
-
-        sess = session.Session(
-            auth=auth,
-            verify=(self.options.os_cacert or not self.options.insecure)
-        )
-
+        auth = loading.load_auth_from_argparse_arguments(self.options)
+        sess = loading.load_session_from_argparse_arguments(
+            self.options, auth=auth)
         self.client = blazar_client.Client(
             self.options.os_reservation_api_version,
             session=sess,
-            service_type=self.options.service_type,
-            interface=self.options.endpoint_type,
+            service_type=self.options.service_type or self.options.os_service_type,
+            interface=self.options.endpoint_type or self.options.os_interface,
             region_name=self.options.os_region_name,
         )
         return
