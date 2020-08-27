@@ -213,12 +213,12 @@ class BlazarShell(app.App):
         parser.add_argument(
             '--service-type', metavar='<service-type>',
             default=env('BLAZAR_SERVICE_TYPE'),
-            help=('(deprecated) Use --os-service-type instead. '
+            help=('(deprecated) use --os-service-type instead. '
                   'Defaults to env[BLAZAR_SERVICE_TYPE].'))
         parser.add_argument(
             '--endpoint-type', metavar='<endpoint-type>',
             default=env('OS_ENDPOINT_TYPE'),
-            help=('(deprecated) Use --os-interface instead. '
+            help=('(deprecated) use --os-interface intstead. '
                   'Defaults to env[OS_ENDPOINT_TYPE].'))
 
         return parser
@@ -351,8 +351,7 @@ class BlazarShell(app.App):
         self.client = blazar_client.Client(
             self.options.os_reservation_api_version,
             session=sess,
-            service_type=(self.options.service_type or
-                          self.options.os_service_type),
+            service_type=self.options.service_type or self.options.os_service_type,
             interface=self.options.endpoint_type or self.options.os_interface,
             region_name=self.options.os_region_name,
         )
