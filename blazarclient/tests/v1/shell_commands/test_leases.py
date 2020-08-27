@@ -14,14 +14,18 @@
 # limitations under the License.
 
 import argparse
+from datetime import datetime
 import mock
+import time
 
 from blazarclient import exception
 from blazarclient import shell
 from blazarclient import tests
 from blazarclient.v1.shell_commands import leases
 
+mock_time = mock.Mock(return_value=datetime(2020, 6, 8))
 
+@mock.patch('blazarclient.v1.shell_commands.leases._utc_now', mock_time)
 class CreateLeaseTestCase(tests.TestCase):
 
     def setUp(self):

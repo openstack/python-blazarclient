@@ -66,6 +66,16 @@ CREATE_RESERVATION_KEYS = {
 }
 
 
+def _utc_now():
+    """Wrap datetime.datetime.utcnow so it can be mocked in unit tests.
+
+    This is required because some of the tests require understanding the
+    'current time'; simply mocking utcnow() is made very difficult by
+    the many different ways the datetime package is used in this module.
+    """
+    return datetime.datetime.utcnow()
+
+
 class ListLeases(command.ListCommand):
     """Print a list of leases."""
     resource = 'lease'
@@ -96,7 +106,7 @@ class CreateLease(command.CreateCommand):
     json_indent = 4
     log = logging.getLogger(__name__ + '.CreateLease')
     default_start = 'now'
-    default_end = datetime.datetime.utcnow() + datetime.timedelta(days=1)
+    default_end = _utc_now() + datetime.timedelta(days=1)
 
     def get_parser(self, prog_name):
         parser = super(CreateLease, self).get_parser(prog_name)
@@ -213,7 +223,7 @@ class CreateLease(command.CreateCommand):
                 raise exception.IncorrectLease
 
         if parsed_args.start == 'now':
-            start = datetime.datetime.utcnow()
+            start = _utc_now()
         else:
             start = parsed_args.start
 
