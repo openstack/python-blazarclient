@@ -6,12 +6,9 @@ coverage==4.0
 debtcollector==1.2.0
 extras==1.0.0
 fixtures==3.0.0
-flake8==2.2.4
-hacking==0.10.2
 iso8601==0.1.11
 keystoneauth1==3.4.0
 linecache2==1.0.0
-mccabe==0.2.1
 mock==3.0.0
 monotonic==0.6
 mox3==0.20.0
@@ -29,7 +26,6 @@ oslotest==3.2.0
 pbr==2.0.0
 pep8==1.5.7
 prettytable==0.7.1
-pyflakes==2.1.1
 pyinotify==0.9.6
 pyparsing==2.1.0
 pyperclip==1.5.27
