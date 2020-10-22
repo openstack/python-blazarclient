@@ -14,7 +14,6 @@
 # limitations under the License.
 import ast
 import logging
-import six
 
 from cliff import command
 from cliff.formatters import table
@@ -90,7 +89,7 @@ class BlazarCommand(OpenStackCommand):
 
     def format_output_data(self, data):
         for k, v in data.items():
-            if isinstance(v, six.text_type):
+            if isinstance(v, str):
                 try:
                     # Deserialize if possible into dict, lists, tuples...
                     v = ast.literal_eval(v)

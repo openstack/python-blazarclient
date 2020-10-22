@@ -25,7 +25,6 @@ from cliff import app
 from cliff import commandmanager
 from keystoneauth1 import loading
 from oslo_utils import encodeutils
-import six
 
 from blazarclient import client as blazar_client
 from blazarclient import exception
@@ -265,10 +264,10 @@ class BlazarShell(app.App):
 
         except Exception as err:
             if self.options.debug:
-                self.log.exception(six.text_type(err))
+                self.log.exception(str(err))
                 raise
             else:
-                self.log.error(six.text_type(err))
+                self.log.error(str(err))
             return 1
         if self.interactive_mode:
             _argv = [sys.argv[0]]
@@ -291,17 +290,17 @@ class BlazarShell(app.App):
             return run_command(cmd, cmd_parser, sub_argv)
         except Exception as err:
             if self.options.debug:
-                self.log.exception(six.text_type(err))
+                self.log.exception(str(err))
             else:
-                self.log.error(six.text_type(err))
+                self.log.error(str(err))
             try:
                 self.clean_up(cmd, result, err)
             except Exception as err2:
                 if self.options.debug:
-                    self.log.exception(six.text_type(err2))
+                    self.log.exception(str(err2))
                 else:
                     self.log.error('Could not clean up: %s',
-                                   six.text_type(err2))
+                                   str(err2))
             if self.options.debug:
                 raise
             else:
@@ -309,10 +308,10 @@ class BlazarShell(app.App):
                     self.clean_up(cmd, result, None)
                 except Exception as err3:
                     if self.options.debug:
-                        self.log.exception(six.text_type(err3))
+                        self.log.exception(str(err3))
                     else:
                         self.log.error('Could not clean up: %s',
-                                       six.text_type(err3))
+                                       str(err3))
         return result
 
     def authenticate_user(self):
@@ -349,7 +348,7 @@ class BlazarShell(app.App):
     def clean_up(self, cmd, result, err):
         self.log.debug('clean_up %s', cmd.__class__.__name__)
         if err:
-            self.log.debug('got an error: %s', six.text_type(err))
+            self.log.debug('got an error: %s', str(err))
 
     def configure_logging(self):
         """Create logging handlers for any log output."""
@@ -383,7 +382,7 @@ def main(argv=sys.argv[1:]):
     except exception.BlazarClientException:
         return 1
     except Exception as e:
-        print(six.text_type(e))
+        print(str(e))
         return 1
 
 
