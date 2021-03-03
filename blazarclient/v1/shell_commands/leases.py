@@ -48,7 +48,7 @@ CREATE_RESERVATION_KEYS = {
         "memory_mb": "",
         "disk_gb": "",
         "amount": "",
-        "affinity": "",
+        "affinity": "None",
         "resource_properties": "",
         "resource_type": 'virtual:instance'
     },
