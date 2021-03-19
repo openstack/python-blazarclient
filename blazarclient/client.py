@@ -19,7 +19,7 @@ from blazarclient import exception
 from blazarclient.i18n import _
 
 
-def Client(version=1, *args, **kwargs):
+def Client(version=1, service_type='reservation', *args, **kwargs):
     version_map = {
         '1': 'blazarclient.v1.client.Client',
         '1a0': 'blazarclient.v1.client.Client',
