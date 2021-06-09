@@ -60,8 +60,18 @@ class BlazarCommandTestCase(tests.TestCase):
         self.command = command.BlazarCommand(self.app, [])
 
     def test_get_client(self):
+        # Test that either client_manager.reservation or client is used,
+        # whichever exists
+
+        client_manager = self.app.client_manager
+        del self.app.client_manager
         client = self.command.get_client()
         self.assertEqual(self.app.client, client)
+
+        self.app.client_manager = client_manager
+        del self.app.client
+        client = self.command.get_client()
+        self.assertEqual(self.app.client_manager.reservation, client)
 
     def test_get_parser(self):
         self.command.get_parser('TestCase')

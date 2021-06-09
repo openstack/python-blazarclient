@@ -81,7 +81,12 @@ class BlazarCommand(OpenStackCommand):
         #     self.formatters['table'] = TableFormatter()
 
     def get_client(self):
-        return self.app.client
+        # client_manager.reservation is used for osc_lib, and should be used
+        # if it exists
+        if hasattr(self.app, 'client_manager'):
+            return self.app.client_manager.reservation
+        else:
+            return self.app.client
 
     def get_parser(self, prog_name):
         parser = super(BlazarCommand, self).get_parser(prog_name)

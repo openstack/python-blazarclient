@@ -91,7 +91,7 @@ class ShowLease(command.ShowCommand):
     log = logging.getLogger(__name__ + '.ShowLease')
 
 
-class CreateLease(command.CreateCommand):
+class CreateLeaseBase(command.CreateCommand):
     """Create a lease."""
     resource = 'lease'
     json_indent = 4
@@ -100,7 +100,7 @@ class CreateLease(command.CreateCommand):
     default_end = _utc_now() + datetime.timedelta(days=1)
 
     def get_parser(self, prog_name):
-        parser = super(CreateLease, self).get_parser(prog_name)
+        parser = super(CreateLeaseBase, self).get_parser(prog_name)
         parser.add_argument(
             'name', metavar=self.resource.upper(),
             help='Name for the %s' % self.resource
@@ -127,22 +127,6 @@ class CreateLease(command.CreateCommand):
             default=None
         )
         parser.add_argument(
-            '--physical-reservation',
-            metavar="<min=int,max=int,hypervisor_properties=str,"
-                    "resource_properties=str,before_end=str>",
-            action='append',
-            dest='physical_reservations',
-            help='Create a reservation for physical compute hosts. '
-                 'Specify option multiple times to create multiple '
-                 'reservations. '
-                 'min: minimum number of hosts to reserve. '
-                 'max: maximum number of hosts to reserve. '
-                 'hypervisor_properties: JSON string, see doc. '
-                 'resource_properties: JSON string, see doc. '
-                 'before_end: JSON string, see doc. ',
-            default=[]
-        )
-        parser.add_argument(
             '--reservation',
             metavar="<key=value>",
             action='append',
@@ -165,36 +149,12 @@ class CreateLease(command.CreateCommand):
         return parser
 
     def args2body(self, parsed_args):
-        def parse_params(str_params, default):
-            request_params = {}
-            prog = re.compile('^(?:(.*),)?(%s)=(.*)$'
-                              % "|".join(default.keys()))
+        params = self._generate_params(parsed_args)
+        if not params['reservations']:
+            raise exception.IncorrectLease
+        return params
 
-            while str_params != "":
-                match = prog.search(str_params)
-
-                if match is None:
-                    raise exception.IncorrectLease(err_msg)
-
-                self.log.info("Matches: %s", match.groups())
-                k, v = match.group(2, 3)
-                if k in request_params.keys():
-                    raise exception.DuplicatedLeaseParameters(err_msg)
-                else:
-                    if strutils.is_int_like(v):
-                        request_params[k] = int(v)
-                    elif isinstance(defaults[k], list):
-                        request_params[k] = jsonutils.loads(v)
-                    else:
-                        request_params[k] = v
-
-                str_params = match.group(1) if match.group(1) else ""
-
-            request_params.update({k: v for k, v in default.items()
-                                   if k not in request_params.keys() and
-                                   v is not None})
-            return request_params
-
+    def _generate_params(self, parsed_args):
         params = {}
         if parsed_args.name:
             params['name'] = parsed_args.name
@@ -243,6 +203,115 @@ class CreateLease(command.CreateCommand):
         params['reservations'] = []
         params['events'] = []
 
+        reservations = []
+        for res_str in parsed_args.reservations:
+            err_msg = ("Invalid reservation argument '%s'. "
+                       "Reservation arguments must be of the "
+                       "form --reservation <key=value>"
+                       % res_str)
+
+            if "physical:host" in res_str:
+                defaults = CREATE_RESERVATION_KEYS['physical:host']
+            elif "virtual:instance" in res_str:
+                defaults = CREATE_RESERVATION_KEYS['virtual:instance']
+            elif "virtual:floatingip" in res_str:
+                defaults = CREATE_RESERVATION_KEYS['virtual:floatingip']
+            else:
+                defaults = CREATE_RESERVATION_KEYS['others']
+
+            res_info = self._parse_params(res_str, defaults, err_msg)
+            reservations.append(res_info)
+
+        if reservations:
+            params['reservations'] += reservations
+
+        events = []
+        for event_str in parsed_args.events:
+            err_msg = ("Invalid event argument '%s'. "
+                       "Event arguments must be of the "
+                       "form --event <event_type=str,event_date=time>"
+                       % event_str)
+            event_info = {"event_type": "", "event_date": ""}
+            for kv_str in event_str.split(","):
+                try:
+                    k, v = kv_str.split("=", 1)
+                except ValueError:
+                    raise exception.IncorrectLease(err_msg)
+                if k in event_info:
+                    event_info[k] = v
+                else:
+                    raise exception.IncorrectLease(err_msg)
+            if not event_info['event_type'] and not event_info['event_date']:
+                raise exception.IncorrectLease(err_msg)
+            event_date = event_info['event_date']
+            try:
+                date = datetime.datetime.strptime(event_date, '%Y-%m-%d %H:%M')
+                event_date = datetime.datetime.strftime(date, '%Y-%m-%d %H:%M')
+                event_info['event_date'] = event_date
+            except ValueError:
+                raise exception.IncorrectLease
+            events.append(event_info)
+        if events:
+            params['events'] = events
+
+        return params
+
+    def _parse_params(self, str_params, default, err_msg):
+        request_params = {}
+        prog = re.compile('^(?:(.*),)?(%s)=(.*)$'
+                          % "|".join(default.keys()))
+
+        while str_params != "":
+            match = prog.search(str_params)
+
+            if match is None:
+                raise exception.IncorrectLease(err_msg)
+
+            self.log.info("Matches: %s", match.groups())
+            k, v = match.group(2, 3)
+            if k in request_params.keys():
+                raise exception.DuplicatedLeaseParameters(err_msg)
+            else:
+                if strutils.is_int_like(v):
+                    request_params[k] = int(v)
+                elif isinstance(default[k], list):
+                    request_params[k] = jsonutils.loads(v)
+                else:
+                    request_params[k] = v
+
+            str_params = match.group(1) if match.group(1) else ""
+
+        request_params.update({k: v for k, v in default.items()
+                               if k not in request_params.keys() and
+                               v is not None})
+        return request_params
+
+
+class CreateLease(CreateLeaseBase):
+
+    def get_parser(self, prog_name):
+        parser = super(CreateLease, self).get_parser(prog_name)
+        parser.add_argument(
+            '--physical-reservation',
+            metavar="<min=int,max=int,hypervisor_properties=str,"
+                    "resource_properties=str,before_end=str>",
+            action='append',
+            dest='physical_reservations',
+            help='Create a reservation for physical compute hosts. '
+                 'Specify option multiple times to create multiple '
+                 'reservations. '
+                 'min: minimum number of hosts to reserve. '
+                 'max: maximum number of hosts to reserve. '
+                 'hypervisor_properties: JSON string, see doc. '
+                 'resource_properties: JSON string, see doc. '
+                 'before_end: JSON string, see doc. ',
+            default=[]
+        )
+        return parser
+
+    def args2body(self, parsed_args):
+        params = self._generate_params(parsed_args)
+
         physical_reservations = []
         for phys_res_str in parsed_args.physical_reservations:
             err_msg = ("Invalid physical-reservation argument '%s'. "
@@ -252,7 +321,7 @@ class CreateLease(command.CreateCommand):
                        "before_end=str>"
                        % phys_res_str)
             defaults = CREATE_RESERVATION_KEYS["physical:host"]
-            phys_res_info = parse_params(phys_res_str, defaults)
+            phys_res_info = self._parse_params(phys_res_str, defaults, err_msg)
 
             if not (phys_res_info['min'] and phys_res_info['max']):
                 raise exception.IncorrectLease(err_msg)
@@ -284,61 +353,10 @@ class CreateLease(command.CreateCommand):
             phys_res_info['resource_type'] = 'physical:host'
             physical_reservations.append(phys_res_info)
         if physical_reservations:
-            params['reservations'] += physical_reservations
-
-        reservations = []
-        for res_str in parsed_args.reservations:
-            err_msg = ("Invalid reservation argument '%s'. "
-                       "Reservation arguments must be of the "
-                       "form --reservation <key=value>"
-                       % res_str)
-
-            if "physical:host" in res_str:
-                defaults = CREATE_RESERVATION_KEYS['physical:host']
-            elif "virtual:instance" in res_str:
-                defaults = CREATE_RESERVATION_KEYS['virtual:instance']
-            elif "virtual:floatingip" in res_str:
-                defaults = CREATE_RESERVATION_KEYS['virtual:floatingip']
-            else:
-                defaults = CREATE_RESERVATION_KEYS['others']
-
-            res_info = parse_params(res_str, defaults)
-            reservations.append(res_info)
-
-        if reservations:
-            params['reservations'] += reservations
-
-        if not params['reservations']:
-            raise exception.IncorrectLease
-
-        events = []
-        for event_str in parsed_args.events:
-            err_msg = ("Invalid event argument '%s'. "
-                       "Event arguments must be of the "
-                       "form --event <event_type=str,event_date=time>"
-                       % event_str)
-            event_info = {"event_type": "", "event_date": ""}
-            for kv_str in event_str.split(","):
-                try:
-                    k, v = kv_str.split("=", 1)
-                except ValueError:
-                    raise exception.IncorrectLease(err_msg)
-                if k in event_info:
-                    event_info[k] = v
-                else:
-                    raise exception.IncorrectLease(err_msg)
-            if not event_info['event_type'] and not event_info['event_date']:
-                raise exception.IncorrectLease(err_msg)
-            event_date = event_info['event_date']
-            try:
-                date = datetime.datetime.strptime(event_date, '%Y-%m-%d %H:%M')
-                event_date = datetime.datetime.strftime(date, '%Y-%m-%d %H:%M')
-                event_info['event_date'] = event_date
-            except ValueError:
-                raise exception.IncorrectLease
-            events.append(event_info)
-        if events:
-            params['events'] = events
+            # We prepend the physical_reservations to preserve legacy order
+            # of reservations
+            params['reservations'] = physical_reservations \
+                + params['reservations']
 
         return params
 
