@@ -13,16 +13,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import argparse
 import datetime
-import logging
 import re
 
 from oslo_serialization import jsonutils
 from oslo_utils import strutils
 
+import argparse
 from blazarclient import command
 from blazarclient import exception
+import logging
 
 
 # All valid reservation parameters must be added to CREATE_RESERVATION_KEYS to
@@ -59,6 +59,12 @@ CREATE_RESERVATION_KEYS = {
         "affinity": "None",
         "resource_properties": "",
         "resource_type": 'virtual:instance'
+    },
+    "device": {
+        "min": "",
+        "max": "",
+        "resource_properties": "",
+        "resource_type": 'device'
     },
     "others": {
         ".*": None
@@ -227,6 +233,8 @@ class CreateLeaseBase(command.CreateCommand):
                 defaults = CREATE_RESERVATION_KEYS['virtual:floatingip']
             elif "network" in res_str:
                 defaults = CREATE_RESERVATION_KEYS['network']
+            elif "device" in res_str:
+                defaults = CREATE_RESERVATION_KEYS['device']
             else:
                 defaults = CREATE_RESERVATION_KEYS['others']
 
@@ -394,7 +402,7 @@ class UpdateLease(command.UpdateCommand):
                  'selected with the id=<reservation-id> key-value pair.',
             default=None)
 
-        #prolong-for and reduce_by are mutually exclusive
+        # prolong-for and reduce_by are mutually exclusive
         group = parser.add_mutually_exclusive_group()
         group.add_argument(
             '--prolong-for',
@@ -416,7 +424,7 @@ class UpdateLease(command.UpdateCommand):
             help='end date of the lease',
             default=None)
 
-        #defer-by and a 'future' advance-by are mutually exclusive
+        # defer-by and a 'future' advance-by are mutually exclusive
         group = parser.add_mutually_exclusive_group()
         group.add_argument(
             '--defer-by',
