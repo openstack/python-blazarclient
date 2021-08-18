@@ -4,3 +4,4 @@
       - openstack-lower-constraints-jobs
       - openstack-python3-xena-jobs
       - release-notes-jobs-python3
+      - openstack-cover-jobs
