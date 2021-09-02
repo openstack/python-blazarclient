@@ -34,4 +34,6 @@ def Client(version=1, service_type='reservation', *args, **kwargs):
                 })
         raise exception.UnsupportedVersion(msg)
 
-    return importutils.import_object(client_path, *args, **kwargs)
+    return importutils.import_object(client_path,
+                                     service_type=service_type,
+                                     *args, **kwargs)
