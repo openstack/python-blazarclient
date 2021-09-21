@@ -14,6 +14,7 @@
 # limitations under the License.
 
 from blazarclient import base
+from blazarclient import exception
 from blazarclient.i18n import _
 
 
@@ -52,3 +53,43 @@ class ComputeHostClientManager(base.BaseClientManager):
         if sort_by:
             hosts = sorted(hosts, key=lambda l: l[sort_by])
         return hosts
+
+    def list_properties(self, detail=False, all=False, sort_by=None):
+        url = '/os-hosts/properties'
+
+        query_parts = []
+        if detail:
+            query_parts.append("detail=True")
+        if all:
+            query_parts.append("all=True")
+        if query_parts:
+            url += "?" + "&".join(query_parts)
+
+        resp, body = self.request_manager.get(url)
+        resource_properties = body['resource_properties']
+
+        # Values is a reserved word in cliff so need to rename values column.
+        if detail:
+            for p in resource_properties:
+                p['property_values'] = p['values']
+                del p['values']
+
+        if sort_by:
+            resource_properties = sorted(resource_properties,
+                                         key=lambda l: l[sort_by])
+        return resource_properties
+
+    def get_property(self, property_name):
+        resource_property = [
+            x for x in self.list_properties(detail=True)
+            if x['property'] == property_name]
+        if not resource_property:
+            raise exception.ResourcePropertyNotFound()
+        return resource_property[0]
+
+    def set_property(self, property_name, private):
+        data = {'private': private}
+        resp, body = self.request_manager.patch(
+            '/os-hosts/properties/%s' % property_name, body=data)
+
+        return body['resource_property']
