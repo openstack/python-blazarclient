@@ -12,11 +12,8 @@
 # implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-from __future__ import print_function
 import ast
 import logging
-import six
 
 from cliff import command
 from cliff.formatters import table
@@ -84,7 +81,12 @@ class BlazarCommand(OpenStackCommand):
         #     self.formatters['table'] = TableFormatter()
 
     def get_client(self):
-        return self.app.client
+        # client_manager.reservation is used for osc_lib, and should be used
+        # if it exists
+        if hasattr(self.app, 'client_manager'):
+            return self.app.client_manager.reservation
+        else:
+            return self.app.client
 
     def get_parser(self, prog_name):
         parser = super(BlazarCommand, self).get_parser(prog_name)
@@ -92,7 +94,7 @@ class BlazarCommand(OpenStackCommand):
 
     def format_output_data(self, data):
         for k, v in data.items():
-            if isinstance(v, six.text_type):
+            if isinstance(v, str):
                 try:
                     # Deserialize if possible into dict, lists, tuples...
                     v = ast.literal_eval(v)

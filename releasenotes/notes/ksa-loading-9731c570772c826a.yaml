@@ -1,0 +1,24 @@
+---
+deprecations:
+  - |
+    The ``blazar`` command-line client has switched to the
+    ``keystoneauth1.loading`` module. As a result, the following options are
+    deprecated:
+
+    * ``--service-type`` (use ``--os-service-type`` instead)
+    * ``--endpoint-type`` (use ``--os-interface`` instead)
+
+    The following options have been removed:
+
+    * ``--os-auth-strategy`` (this option had not effect)
+    * ``--os_auth_strategy`` (this option had not effect)
+    * ``--os_auth_url`` (use ``--os-auth-url`` instead)
+    * ``--os_project_name`` (use ``--os-project-name`` instead)
+    * ``--os_project_id`` (use ``--os-project-id`` instead)
+    * ``--os_project_domain_name`` (use ``--os-project-domain-name`` instead)
+    * ``--os_project_domain_id`` (use ``--os-project-domain-id`` instead)
+    * ``--os_tenant_name`` (use ``--os-project-name`` or ``--os-tenant-name`` instead)
+    * ``--os_username`` (use ``--os-username`` instead)
+    * ``--os_user_domain_name`` (use ``--os-user-domain-name`` instead)
+    * ``--os_user_domain_id`` (use ``--os-user-domain-id`` instead)
+    * ``--os_token`` (use ``--os-token`` instead)

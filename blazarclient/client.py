@@ -19,7 +19,7 @@ from blazarclient import exception
 from blazarclient.i18n import _
 
 
-def Client(version=1, *args, **kwargs):
+def Client(version=1, service_type='reservation', *args, **kwargs):
     version_map = {
         '1': 'blazarclient.v1.client.Client',
         '1a0': 'blazarclient.v1.client.Client',
@@ -34,4 +34,6 @@ def Client(version=1, *args, **kwargs):
                 })
         raise exception.UnsupportedVersion(msg)
 
-    return importutils.import_object(client_path, *args, **kwargs)
+    return importutils.import_object(client_path,
+                                     service_type=service_type,
+                                     *args, **kwargs)

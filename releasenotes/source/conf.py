@@ -56,9 +56,9 @@ extensions = [
 ]
 
 # openstackdocstheme options
-repository_name = 'openstack/python-blazarclient'
-bug_project = 'blazar'
-bug_tag = ''
+openstackdocs_repo_name = 'openstack/python-blazarclient'
+openstackdocs_bug_project = 'blazar'
+openstackdocs_bug_tag = ''
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -85,7 +85,7 @@ language = None
 exclude_patterns = []
 
 # The name of the Pygments (syntax highlighting) style to use.
-pygments_style = 'sphinx'
+pygments_style = 'native'
 
 
 # -- Options for HTML output -------------------------------------------------

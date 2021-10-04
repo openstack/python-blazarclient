@@ -14,7 +14,7 @@
 # limitations under the License.
 
 
-import mock
+from unittest import mock
 
 from blazarclient import base
 from blazarclient import exception

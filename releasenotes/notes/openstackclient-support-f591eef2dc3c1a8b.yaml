@@ -1,0 +1,5 @@
+---
+features:
+  - |
+    Add openstackclient plugin support, enabling blazar commands to be used
+    within the openstack CLI.

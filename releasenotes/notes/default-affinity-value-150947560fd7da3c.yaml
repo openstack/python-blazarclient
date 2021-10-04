@@ -1,0 +1,5 @@
+---
+fixes:
+  - |
+    Fixes creation of instance reservations when no affinity value is provided,
+    in which case affinity is set to ``None``.
