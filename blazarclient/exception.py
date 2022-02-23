@@ -90,3 +90,9 @@ class InsufficientAuthInformation(BlazarClientException):
                 "for the authentication. The instance of "
                 "keystoneauth1.session.Session class is required.")
     code = 400
+
+
+class ResourcePropertyNotFound(BlazarClientException):
+    """Occurs if the resource property specified does not exist"""
+    message = _("The resource property does not exist.")
+    code = 404
