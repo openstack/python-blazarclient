@@ -142,6 +142,30 @@ class UpdateNetwork(command.UpdateCommand):
             params['values'] = extras
         return params
 
+class UnsetAttributeNetwork(UpdateNetwork):
+    log = logging.getLogger(__name__ + '.UnsetAttributeNetwork')
+
+    def get_parser(self, prog_name):
+        parser = super(UpdateNetwork, self).get_parser(prog_name)
+        parser.add_argument(
+            '--extra', metavar='<key>',
+            action='append',
+            dest='extra_capabilities',
+            default=[],
+            help='Extra capability keys which should be unset from the network.'
+        )
+        return parser
+
+    def args2body(self, parsed_args):
+        if parsed_args.extra_capabilities:
+            return {
+                'values': {
+                    cap: None for cap in parsed_args.extra_capabilities
+                }
+            }
+        else:
+            return {}
+
 
 class DeleteNetwork(command.DeleteCommand):
     """Delete a network."""
