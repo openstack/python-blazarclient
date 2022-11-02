@@ -104,11 +104,18 @@ def get_item_properties(item, fields, mixed_case_fields=None, formatters=None):
 
 def find_resource_id_by_name_or_id(client, resource_type, name_or_id,
                                    name_key, id_pattern):
-    if re.match(id_pattern, name_or_id):
-        return name_or_id
-
-    return _find_resource_id_by_name(client, resource_type, name_or_id,
-                                     name_key)
+    try:
+        # Since IDs and Hypervisor Hostnames can both be UUIDs, we'll first
+        # try to look up by Hypervisor Hostname
+        return _find_resource_id_by_name(client, resource_type,
+                                         name_or_id, name_key)
+    except exception.BlazarClientException as e:
+        # If we fail to find a host by Hypervisor Hostname, we'll check if the
+        # key could be an ID, and then we'll return that.
+        if re.match(id_pattern, name_or_id):
+            return name_or_id
+        else:
+            raise e
 
 
 def _find_resource_id_by_name(client, resource_type, name, name_key):

@@ -18,7 +18,8 @@ import logging
 from blazarclient import command
 from blazarclient import exception
 
-HOST_ID_PATTERN = '^[0-9]+$'
+# Matches integers or UUIDs
+HOST_ID_PATTERN = r'^([0-9]+|([0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}))$'
 
 
 class ListHosts(command.ListCommand):
