@@ -282,12 +282,6 @@ class ShowCommand(BlazarCommand, show.ShowOne):
 
     def get_parser(self, prog_name):
         parser = super(ShowCommand, self).get_parser(prog_name)
-        if self.allow_names:
-            help_str = 'ID or name of %s to look up'
-        else:
-            help_str = 'ID of %s to look up'
-        parser.add_argument('id', metavar=self.resource.upper(),
-                            help=help_str % self.resource)
         return parser
 
     def get_data(self, parsed_args):

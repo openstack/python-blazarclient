@@ -46,6 +46,16 @@ class ShowHost(command.ShowCommand):
     id_pattern = HOST_ID_PATTERN
     log = logging.getLogger(__name__ + '.ShowHost')
 
+    def get_parser(self, prog_name):
+        parser = super(ShowHost, self).get_parser(prog_name)
+        if self.allow_names:
+            help_str = 'ID or name of %s to look up'
+        else:
+            help_str = 'ID of %s to look up'
+        parser.add_argument('id', metavar=self.resource.upper(),
+                            help=help_str % self.resource)
+        return parser
+
 
 class CreateHost(command.CreateCommand):
     """Create a host."""

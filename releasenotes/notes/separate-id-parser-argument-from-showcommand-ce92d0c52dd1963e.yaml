@@ -1,0 +1,6 @@
+---
+other:
+  - |
+    The ID parser argument is moved from the ShowCommand class to each resource
+    class. This allows the ordering of arguments to be fully customised,
+    instead of requiring the ID to come first.
