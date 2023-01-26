@@ -85,38 +85,6 @@ class UpdateNetworkTest(tests.TestCase):
         network_manager.update.assert_called_once_with('101', **expected)
 
 
-class UnsetAttributesNetworkTest(tests.TestCase):
-
-    def create_unset_command(self, list_value):
-        mock_network_manager = mock.Mock()
-        mock_network_manager.list.return_value = list_value
-
-        mock_client = mock.Mock()
-        mock_client.network = mock_network_manager
-
-        blazar_shell = shell.BlazarShell()
-        blazar_shell.client = mock_client
-        return networks.UnsetAttributeNetwork(
-            blazar_shell, mock.Mock()
-        ), mock_network_manager
-
-    def test_unset_network(self):
-        list_value = [
-            {'id': '101', 'networkname': 'network-1'},
-            {'id': '201', 'networkname': 'network-2'},
-        ]
-        unset_network, network_manager = self.create_unset_command(list_value)
-        extra_caps = ['key1', 'key2']
-        args = argparse.Namespace(
-            id='101',
-            extra_capabilities=extra_caps,
-        )
-        expected = {
-            'values': {key: None for key in extra_caps}
-       }
-        unset_network.run(args)
-        network_manager.assert_called_once_with('101', **expected)
-
 class ShowNetworkTest(tests.TestCase):
 
     def create_show_command(self, list_value, get_value):

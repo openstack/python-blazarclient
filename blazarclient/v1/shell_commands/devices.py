@@ -131,31 +131,6 @@ class UpdateDevice(command.UpdateCommand):
         return params
 
 
-class UnsetAttributeDevice(UpdateDevice):
-    log = logging.getLogger(__name__ + '.UnsetAttributeDevice')
-
-    def get_parser(self, prog_name):
-        parser = super(UpdateDevice, self).get_parser(prog_name)
-        parser.add_argument(
-            '--extra', metavar='<key>',
-            action='append',
-            dest='extra_capabilities',
-            default=[],
-            help='Extra capability keys which should be unset from the device.',
-        )
-        return parser
-
-    def args2body(self, parsed_args):
-        if parsed_args.extra_capabilities:
-            return {
-                'values': {
-                    cap: None for cap in parsed_args.extra_capabilities
-                }
-            }
-        else:
-            return {}
-
-
 class DeleteDevice(command.DeleteCommand):
     """Delete a device."""
     resource = 'device'

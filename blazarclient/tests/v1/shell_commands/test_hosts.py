@@ -123,36 +123,6 @@ class UpdateHostTest(tests.TestCase):
         host_manager.update.assert_called_once_with('101', **expected)
 
 
-class UnsetAttributesHostTest(tests.TestCase):
-
-    def create_unset_command(self, list_value):
-        mock_host_manager = mock.Mock()
-        mock_host_manager.list.return_value = list_value
-
-        mock_client = mock.Mock()
-        mock_client.host = mock_host_manager
-
-        blazar_shell = shell.BlazarShell()
-        blazar_shell.client = mock_client
-        return hosts.UnsetAttributesHost(blazar_shell, mock.Mock()), mock_host_manager
-
-    def test_unset_host(self):
-        list_value = [
-            {'id': '101', 'hypervisor_hostname': 'host-1'},
-            {'id': '201', 'hypervisor_hostname': 'host-2'},
-        ]
-        unset_host, host_manager = self.create_unset_command(list_value)
-        extra_caps = ['key1', 'key2']
-        args = argparse.Namespace(
-            id='101',
-            extra_capabilities=extra_caps
-        )
-        expected = {
-            'values': {key: None for key in extra_caps}
-        }
-        unset_host.run(args)
-        host_manager.update.assert_called_once_with('101', **expected)
-
 class ShowHostTest(tests.TestCase):
 
     def create_show_command(self, list_value, get_value):
