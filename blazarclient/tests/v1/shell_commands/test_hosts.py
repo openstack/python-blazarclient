@@ -123,7 +123,7 @@ class UpdateHostTest(tests.TestCase):
         host_manager.update.assert_called_once_with('101', **expected)
 
 
-class UnsetAttributeHostTest(tests.TestCase):
+class UnsetAttributesHostTest(tests.TestCase):
 
     def create_unset_command(self, list_value):
         mock_host_manager = mock.Mock()
@@ -134,7 +134,7 @@ class UnsetAttributeHostTest(tests.TestCase):
 
         blazar_shell = shell.BlazarShell()
         blazar_shell.client = mock_client
-        return hosts.UnsetAttributeHost(blazar_shell, mock.Mock()), mock_host_manager
+        return hosts.UnsetAttributesHost(blazar_shell, mock.Mock()), mock_host_manager
 
     def test_unset_host(self):
         list_value = [
