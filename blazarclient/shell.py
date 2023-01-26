@@ -45,7 +45,7 @@ COMMANDS_V1 = {
     'host-show': hosts.ShowHost,
     'host-create': hosts.CreateHost,
     'host-update': hosts.UpdateHost,
-    'host-unset': hosts.UnsetAttributesHost,
+    'host-unset': hosts.UnsetAttributeHost,
     'host-delete': hosts.DeleteHost,
     'host-allocation-show': hosts.ShowHostAllocation,
     'host-allocation-list': hosts.ListHostAllocations,
