@@ -115,6 +115,7 @@ class UpdateHost(command.UpdateCommand):
             params['values'] = extras
         return params
 
+
 class UnsetAttributesHost(UpdateHost):
     """Unset attributes of a host."""
     log = logging.getLogger(__name__ + '.UnsetAttributesHost')
