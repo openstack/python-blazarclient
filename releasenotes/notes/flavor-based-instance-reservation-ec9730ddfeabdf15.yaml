@@ -1,0 +1,4 @@
+---
+features:
+  - |
+    Add support for creating flavor-based instance reservations.

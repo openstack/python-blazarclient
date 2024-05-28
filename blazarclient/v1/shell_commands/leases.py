@@ -52,6 +52,12 @@ CREATE_RESERVATION_KEYS = {
         "resource_properties": "",
         "resource_type": 'virtual:instance'
     },
+    "flavor:instance": {
+        "flavor_id": "",
+        "amount": "",
+        "affinity": "None",
+        "resource_type": 'flavor:instance'
+    },
     "others": {
         ".*": None
     }
@@ -226,6 +232,8 @@ class CreateLeaseBase(command.CreateCommand):
                 defaults = CREATE_RESERVATION_KEYS['virtual:instance']
             elif "virtual:floatingip" in res_str:
                 defaults = CREATE_RESERVATION_KEYS['virtual:floatingip']
+            elif "flavor:instance" in res_str:
+                defaults = CREATE_RESERVATION_KEYS['flavor:instance']
             else:
                 defaults = CREATE_RESERVATION_KEYS['others']
 
