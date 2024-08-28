@@ -51,7 +51,7 @@ class ComputeHostClientManager(base.BaseClientManager):
         resp, body = self.request_manager.get('/os-hosts')
         hosts = body['hosts']
         if sort_by:
-            hosts = sorted(hosts, key=lambda l: l[sort_by])
+            hosts = sorted(hosts, key=lambda host: host[sort_by])
         return hosts
 
     def list_properties(self, detail=False, all=False, sort_by=None):
@@ -76,7 +76,7 @@ class ComputeHostClientManager(base.BaseClientManager):
 
         if sort_by:
             resource_properties = sorted(resource_properties,
-                                         key=lambda l: l[sort_by])
+                                         key=lambda rp: rp[sort_by])
         return resource_properties
 
     def get_property(self, property_name):

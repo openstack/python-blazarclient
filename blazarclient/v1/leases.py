@@ -91,7 +91,7 @@ class LeaseClientManager(base.BaseClientManager):
         resp, body = self.request_manager.get('/leases')
         leases = body['leases']
         if sort_by:
-            leases = sorted(leases, key=lambda l: l[sort_by])
+            leases = sorted(leases, key=lambda lease: lease[sort_by])
         return leases
 
     def _add_lease_date(self, values, lease, key, delta_date, positive_delta):

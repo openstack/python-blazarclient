@@ -43,5 +43,5 @@ class FloatingIPClientManager(base.BaseClientManager):
         resp, body = self.request_manager.get('/floatingips')
         floatingips = body['floatingips']
         if sort_by:
-            floatingips = sorted(floatingips, key=lambda l: l[sort_by])
+            floatingips = sorted(floatingips, key=lambda fip: fip[sort_by])
         return floatingips

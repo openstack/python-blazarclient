@@ -30,5 +30,5 @@ class AllocationClientManager(base.BaseClientManager):
         resp, body = self.request_manager.get('/%s/allocations' % resource)
         allocations = body['allocations']
         if sort_by:
-            allocations = sorted(allocations, key=lambda l: l[sort_by])
+            allocations = sorted(allocations, key=lambda alloc: alloc[sort_by])
         return allocations
