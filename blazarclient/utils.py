@@ -22,7 +22,7 @@ from oslo_serialization import jsonutils as json
 from blazarclient import exception
 from blazarclient.i18n import _
 
-ELAPSED_TIME_REGEX = '^(\d+)([s|m|h|d])$' # noqa W605
+ELAPSED_TIME_REGEX = r'^(\d+)([s|m|h|d])$'
 
 LEASE_DATE_FORMAT = '%Y-%m-%dT%H:%M:%S.%f'
 API_DATE_FORMAT = '%Y-%m-%d %H:%M'
