@@ -53,8 +53,6 @@ def to_primitive(value):
         return o
     elif isinstance(value, datetime.datetime):
         return str(value)
-    elif hasattr(value, 'iteritems'):
-        return to_primitive(dict(value.items()))
     elif hasattr(value, '__iter__'):
         return to_primitive(list(value))
     else:
