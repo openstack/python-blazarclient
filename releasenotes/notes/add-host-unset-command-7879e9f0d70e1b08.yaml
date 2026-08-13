@@ -1,0 +1,5 @@
+---
+features:
+  - |
+    Added a new command ``openstack reservation host unset``, or ``blazar
+    host-unset``, which allows removing extra capabilities from a host.
